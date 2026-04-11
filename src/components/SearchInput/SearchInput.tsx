@@ -1,12 +1,25 @@
-import { InputHTMLAttributes } from "react";
+import type { InputHTMLAttributes } from "react";
 
 interface SearchInputProps
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, "onChange"> {
+  extends Omit<InputHTMLAttributes<HTMLInputElement>, "onChange" | "size"> {
   value: string;
   onChange: (value: string) => void;
   onClear?: () => void;
   loading?: boolean;
+  size?: "sm" | "md" | "lg";
 }
+
+const sizeClasses = {
+  sm: "py-2 pl-9 pr-9 text-sm",
+  md: "py-3 pl-10 pr-10 text-sm",
+  lg: "py-4 pl-12 pr-12 text-base",
+};
+
+const iconPositions = {
+  sm: { left: "left-2.5", right: "right-2.5", size: 14 },
+  md: { left: "left-3", right: "right-3", size: 16 },
+  lg: { left: "left-4", right: "right-4", size: 18 },
+};
 
 const SearchInput = ({
   value,
@@ -15,14 +28,17 @@ const SearchInput = ({
   loading = false,
   placeholder = "Search...",
   className = "",
+  size = "md",
   ...props
 }: SearchInputProps) => {
+  const ic = iconPositions[size];
+
   return (
     <div className={`relative ${className}`}>
-      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-brutal-gray)]">
+      <div className={`absolute ${ic.left} top-1/2 -translate-y-1/2 text-[var(--color-brutal-gray)] pointer-events-none`}>
         <svg
-          width="18"
-          height="18"
+          width={ic.size}
+          height={ic.size}
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -39,12 +55,12 @@ const SearchInput = ({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full border-2 border-[var(--color-brutal-black)] bg-white py-3 pl-10 pr-10 font-[family-name:var(--font-display)] text-sm font-bold uppercase tracking-wider placeholder:text-[var(--color-brutal-gray)] placeholder:font-normal placeholder:normal-case placeholder:tracking-normal focus:outline-none focus:ring-0"
+        className={`w-full border-2 border-[var(--color-brutal-black)] bg-white ${sizeClasses[size]} font-[family-name:var(--font-display)] font-bold uppercase tracking-wider placeholder:text-[var(--color-brutal-gray)] placeholder:font-normal placeholder:normal-case placeholder:tracking-normal focus:outline-none focus:ring-0`}
         {...props}
       />
 
       {loading && (
-        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+        <div className={`absolute ${ic.right} top-1/2 -translate-y-1/2`}>
           <div
             className="h-4 w-4 border-2 border-[var(--color-brutal-black)] border-t-[var(--color-brutal-yellow)] rounded-full"
             style={{ animation: "spin 1s linear infinite" }}
@@ -55,12 +71,12 @@ const SearchInput = ({
       {!loading && value && onClear && (
         <button
           onClick={onClear}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-brutal-gray)] hover:text-[var(--color-brutal-black)] border-none bg-transparent cursor-pointer p-0"
+          className={`absolute ${ic.right} top-1/2 -translate-y-1/2 text-[var(--color-brutal-gray)] hover:text-[var(--color-brutal-black)] border-none bg-transparent cursor-pointer p-0`}
           aria-label="Clear search"
         >
           <svg
-            width="16"
-            height="16"
+            width="14"
+            height="14"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"

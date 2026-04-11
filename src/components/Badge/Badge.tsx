@@ -1,4 +1,4 @@
-import { HTMLAttributes, ReactNode } from "react";
+import type { HTMLAttributes, ReactNode } from "react";
 
 type BadgeVariant = "primary" | "success" | "warning" | "danger" | "info" | "neutral";
 
