@@ -1,73 +1,89 @@
-# React + TypeScript + Vite
+# fun-ui
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React component library with a brutalist design aesthetic. Bold typography, sharp borders, chunky shadows, zero border-radius.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **React 19** + **TypeScript 6**
+- **Vite 8** (ES module library build)
+- **Tailwind CSS 4** + custom CSS layers
+- **Storybook 10** for component development and documentation
 
-## React Compiler
+## Getting Started
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Development
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```bash
+# Run Storybook (component playground)
+npm run storybook        # http://localhost:6006
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Run Vite dev server (demo page)
+npm run dev
+```
+
+### Build
+
+```bash
+npm run build            # Type-check + library build
+npm run build:lib        # Library build only (skip type-check)
+npm run build-storybook  # Static Storybook site
+```
+
+### Quality
+
+```bash
+npm run lint             # ESLint
+```
+
+## Components
+
+**Primitives** -- Button, Card, Badge, SearchInput
+
+**Feedback** -- LoadingSpinner, ErrorMessage, ErrorBoundary, StatusBox, EmptyState, StarRating, ProgressBar, Modal
+
+**Layout & Navigation** -- PageHeader, TabNavigation, Footer
+
+**Data Display** -- DataTable, StatCard, LiveIndicator, Tooltip
+
+## Usage as a Library
+
+```tsx
+import { Button, Card, Badge } from "fun-ui";
+```
+
+Consumers must also import the stylesheet after Tailwind:
+
+```css
+@import "tailwindcss";
+@import "fun-ui/styles";
+```
+
+## Design System
+
+**Fonts** -- Space Grotesk (display/headings), Inter (body)
+
+**Colors** -- `brutal-blue` (primary), `brutal-red` (danger), `brutal-yellow` (warning), `brutal-green` (success), plus pink, teal, orange, purple, gray
+
+**Shadows** -- `shadow-brutal` (4px offset), `shadow-brutal-sm` (2px offset)
+
+**Hover effect** -- `translate(2px, 2px)` with shadow removal
+
+All headings are uppercase with `letter-spacing: 0.05em`. No border-radius anywhere.
+
+## Project Structure
+
+```
+src/
+  components/       # One directory per component (tsx + stories + index)
+  styles/
+    globals.css     # Tailwind imports + CSS variables + base styles
+    brutal.css      # Component classes (@layer components)
+    animations.css  # Keyframe animations
+    library.css     # Consumer-facing stylesheet export
+  index.ts          # Barrel file (all public exports)
+.storybook/         # Storybook config (main.ts, preview.ts, preview-head.html)
 ```
