@@ -1,0 +1,4312 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Components Manifest</title>
+  <style>
+      :root {
+          --bg: #0b0c10;
+          --panel: #121318;
+          --muted: #9aa0a6;
+          --fg: #e8eaed;
+          --ok: #22c55e;
+          --info: #1e88e5;
+          --err: #c62828;
+          --ok-bg: #0c1a13;
+          --info-bg: #0c1624;
+          --err-bg: #1a0e0e;
+          --chip: #1f2330;
+          --border: #2b2f3a;
+          --link: #8ab4f8;
+          --active-ring: 1px; /* 1px active ring for pills and toggles */
+      }
+
+      * {
+          box-sizing: border-box;
+      }
+
+      html,
+      body {
+          margin: 0;
+          background: var(--bg);
+          color: var(--fg);
+          font: 14px/1.5 system-ui,
+          -apple-system,
+          Segoe UI,
+          Roboto,
+          Ubuntu,
+          Cantarell,
+          'Helvetica Neue',
+          Arial,
+          'Noto Sans';
+      }
+
+      .wrap {
+          max-width: 1100px;
+          margin: 0 auto;
+          padding: 16px 20px;
+      }
+
+      header {
+          position: sticky;
+          top: 0;
+          backdrop-filter: blur(6px);
+          background: color-mix(in srgb, var(--bg) 84%, transparent);
+          border-bottom: 1px solid var(--border);
+          z-index: 10;
+      }
+
+      h1 {
+          font-size: 20px;
+          margin: 0 0 6px;
+      }
+
+      .summary {
+          display: flex;
+          gap: 12px;
+          flex-wrap: wrap;
+          align-items: center;
+      }
+
+      /* Top filter pills */
+      .filter-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 6px 12px;
+          border: 1px solid var(--border);
+          border-radius: 999px;
+          background: var(--panel);
+          text-decoration: none;
+          cursor: pointer;
+          user-select: none;
+          color: var(--fg);
+      }
+
+      .filter-pill.ok {
+          color: #b9f6ca;
+          border-color: color-mix(in srgb, var(--ok) 55%, var(--border));
+          background: color-mix(in srgb, var(--ok) 18%, #000);
+      }
+
+      .filter-pill.info {
+          color: #b3d9ff;
+          border-color: color-mix(in srgb, var(--info) 55%, var(--border));
+          background: var(--info-bg);
+      }
+
+      .filter-pill.err {
+          color: #ff9aa0;
+          border-color: color-mix(in srgb, var(--err) 55%, var(--border));
+          background: var(--err-bg);
+      }
+
+      .filter-pill.all {
+          color: #d7dbe0;
+          border-color: var(--border);
+          background: var(--panel);
+      }
+
+      .filter-pill[aria-disabled='true'] {
+          cursor: default;
+          text-decoration: none;
+      }
+
+      .filter-pill:focus,
+      .filter-pill:active {
+          outline: none;
+          box-shadow: none;
+      }
+
+      /* Selected top pill ring via :target */
+      #filter-all:target ~ header .filter-pill[data-k='all'],
+      #filter-errors:target ~ header .filter-pill[data-k='errors'],
+      #filter-infos:target ~ header .filter-pill[data-k='infos'],
+      #filter-story-errors:target ~ header .filter-pill[data-k='story-errors'],
+      #filter-doc-errors:target ~ header .filter-pill[data-k='docs'],
+      #filter-docs:target ~ header .filter-pill[data-k='docs'] {
+          box-shadow: 0 0 0 var(--active-ring) currentColor;
+          border-color: currentColor;
+      }
+
+      /* Hidden targets for filtering */
+      #filter-all,
+      #filter-errors,
+      #filter-infos,
+      #filter-story-errors,
+      #filter-doc-errors,
+      #filter-docs {
+          display: none;
+      }
+
+      main {
+          padding: 36px 0 40px;
+      }
+
+      .grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 18px;
+      }
+
+      /* one card per row */
+
+      .card {
+          border: 1px solid var(--border);
+          background: var(--panel);
+          border-radius: 14px;
+          padding: 14px;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+      }
+
+      .head {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+      }
+
+      .title {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 10px;
+      }
+
+      .title h2 {
+          font-size: 16px;
+          margin: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+      }
+
+      .meta {
+          font-size: 12px;
+          color: var(--muted);
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+      }
+
+      .kv {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+      }
+
+      .chip {
+          font-size: 12px;
+          padding: 4px 8px;
+          border-radius: 999px;
+          background: var(--chip);
+          border: 1px solid var(--border);
+      }
+
+      .hint {
+          color: var(--muted);
+          font-size: 12px;
+      }
+
+      .badges {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+      }
+
+      /* Per-card badges: labels become toggles when clickable */
+      .badge {
+          font-size: 12px;
+          padding: 3px 8px;
+          border-radius: 999px;
+          border: 1px solid var(--border);
+          background: var(--chip);
+          color: #d7dbe0;
+      }
+
+      .badge.ok {
+          color: #b9f6ca;
+          border-color: color-mix(in srgb, var(--ok) 55%, var(--border));
+      }
+
+      .badge.info {
+          color: #b3d9ff;
+          border-color: color-mix(in srgb, var(--info) 55%, var(--border));
+      }
+
+      .badge.err {
+          color: #ff9aa0;
+          border-color: color-mix(in srgb, var(--err) 55%, var(--border));
+      }
+
+      .as-toggle {
+          cursor: pointer;
+      }
+
+      /* 1px ring on active toggle */
+      .tg-err:checked + label.as-toggle,
+      .tg-info:checked + label.as-toggle,
+      .tg-stories:checked + label.as-toggle,
+      .tg-docs:checked + label.as-toggle,
+      .tg-content:checked + label.as-toggle,
+      .tg-props:checked + label.as-toggle {
+          box-shadow: 0 0 0 var(--active-ring) currentColor;
+          border-color: currentColor;
+      }
+
+      /* Panels: hidden by default, shown when respective toggle checked */
+      .panels {
+          display: grid;
+          gap: 10px;
+      }
+
+      .panel {
+          display: none;
+      }
+
+      .tg-err:checked ~ .panels .panel-err {
+          display: grid;
+      }
+
+      .tg-info:checked ~ .panels .panel-info {
+          display: grid;
+          gap: 8px;
+      }
+
+      .tg-stories:checked ~ .panels .panel-stories {
+          display: grid;
+          gap: 8px;
+      }
+
+      .tg-docs:checked ~ .panels .panel-docs {
+          display: grid;
+          gap: 8px;
+      }
+
+      .tg-content:checked ~ .panels .panel-content {
+          display: grid;
+          gap: 8px;
+      }
+
+      .tg-props:checked ~ .panels .panel-props {
+          display: grid;
+      }
+
+      /* Colored notes for prop type error + info */
+      .note {
+          padding: 12px;
+          border: 1px solid var(--border);
+          border-radius: 10px;
+      }
+
+      .note.err {
+          border-color: color-mix(in srgb, var(--err) 55%, var(--border));
+          background: var(--err-bg);
+          color: #ffd1d4;
+      }
+
+      .note.info {
+          border-color: color-mix(in srgb, var(--info) 55%, var(--border));
+          background: var(--info-bg);
+          color: #d6e8ff;
+      }
+
+      .note.ok {
+          border-color: color-mix(in srgb, var(--ok) 55%, var(--border));
+          background: var(--ok-bg);
+          color: var(--fg);
+      }
+
+      .note-title {
+          font-weight: 600;
+          margin-bottom: 6px;
+      }
+
+      .note-body {
+          white-space: normal;
+      }
+
+      /* Story error cards */
+      .ex {
+          padding: 10px;
+          border: 1px solid var(--border);
+          border-radius: 10px;
+          background: #0f131b;
+      }
+
+      .ex.err {
+          border-color: color-mix(in srgb, var(--err) 55%, var(--border));
+      }
+
+      .row {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          flex-wrap: wrap;
+      }
+
+      .status-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          display: inline-block;
+      }
+
+      .dot-ok {
+          background: var(--ok);
+      }
+
+      .dot-err {
+          background: var(--err);
+      }
+
+      .ex-name {
+          font-weight: 600;
+      }
+
+      /* Error groups (visible in errors filter) */
+      .error-groups {
+          display: none;
+          margin-bottom: 16px;
+      }
+
+      .group {
+          border: 1px solid var(--border);
+          background: var(--panel);
+          border-radius: 14px;
+          overflow: hidden;
+      }
+
+      .group + .group {
+          margin-top: 12px;
+      }
+
+      .group-header {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 12px 14px;
+          cursor: pointer;
+          border-bottom: 1px solid var(--border);
+      }
+
+      .group-header:hover {
+          background: #141722;
+      }
+
+      .group-title {
+          font-weight: 600;
+          flex: 1;
+      }
+
+      .group-count {
+          font-size: 12px;
+          color: var(--muted);
+      }
+
+      .group-cards {
+          display: none;
+          padding: 12px;
+      }
+
+      .group .card {
+          margin: 12px 0;
+      }
+
+      .group .card:first-child {
+          margin-top: 0;
+      }
+
+      .group .card:last-child {
+          margin-bottom: 0;
+      }
+
+      /* caret rotation */
+      .group-tg:checked + label .caret {
+          transform: rotate(90deg);
+      }
+
+      .caret {
+          transition: transform 0.15s ease;
+      }
+
+      /* toggle body */
+      .group-tg:checked ~ .group-cards {
+          display: block;
+      }
+
+      /* CSS-only filtering of cards via top pills */
+      #filter-errors:target ~ main .card:not(.has-error):not(.has-story-error) {
+          display: none;
+      }
+
+      #filter-infos:target ~ main .card:not(.has-info) {
+          display: none;
+      }
+
+      #filter-story-errors:target ~ main .card:not(.has-story-error) {
+          display: none;
+      }
+
+      #filter-doc-errors:target ~ main .card:not(.has-doc-error) {
+          display: none;
+      }
+
+      #filter-docs:target ~ main .card:has(> .tg-docs),
+      #filter-docs:target ~ main .card.is-doc {
+          display: block;
+      }
+
+      #filter-docs:target ~ main .card:not(:has(> .tg-docs)):not(.is-doc) {
+          display: none;
+      }
+
+      #filter-all:target ~ main .card {
+          display: block;
+      }
+
+      /* In errors view, hide standalone component-error cards in the regular grid (they will appear in groups) */
+      #filter-errors:target ~ main .grid .card.has-error {
+          display: none;
+      }
+
+      /* Show grouped section only in errors view */
+      #filter-errors:target ~ main .error-groups {
+          display: block;
+      }
+
+      /* Section titles */
+      .section-title {
+          font-size: 16px;
+          font-weight: 600;
+          color: var(--muted);
+          margin: 24px 0 12px;
+          padding-bottom: 8px;
+          border-bottom: 1px solid var(--border);
+      }
+      .section-title:first-child {
+          margin-top: 0;
+      }
+
+      /* When a toggle is checked, show the corresponding panel */
+      .card > .tg-err:checked ~ .panels .panel-err {
+          display: grid;
+      }
+      
+      .card > .tg-info:checked ~ .panels .panel-info {
+          display: grid;
+      }
+      
+      .card > .tg-stories:checked ~ .panels .panel-stories {
+          display: grid;
+      }
+
+      .card > .tg-docs:checked ~ .panels .panel-docs {
+          display: grid;
+      }
+
+      .card > .tg-content:checked ~ .panels .panel-content {
+          display: grid;
+      }
+
+      /* Add vertical spacing around panels only when any panel is visible */
+      .card > .tg-err:checked ~ .panels,
+      .card > .tg-info:checked ~ .panels,
+      .card > .tg-stories:checked ~ .panels,
+      .card > .tg-docs:checked ~ .panels,
+      .card > .tg-content:checked ~ .panels,
+      .card > .tg-props:checked ~ .panels {
+          margin: 10px 0;
+      }
+
+      /* Optional: a subtle 1px ring on the active badge, using :has() if available */
+      @supports selector(.card:has(.tg-err:checked)) {
+          .card:has(.tg-err:checked) label[for$='-err'],
+          .card:has(.tg-info:checked) label[for$='-info'],
+          .card:has(.tg-stories:checked) label[for$='-stories'],
+          .card:has(.tg-docs:checked) label[for$='-docs'],
+          .card:has(.tg-content:checked) label[for$='-content'],
+          .card:has(.tg-props:checked) label[for$='-props'] {
+              box-shadow: 0 0 0 1px currentColor;
+              border-color: currentColor;
+          }
+      }
+
+      /* Wrap long lines in code blocks at ~120 characters */
+      pre, code {
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      }
+      pre {
+          white-space: pre-wrap;
+          overflow-wrap: anywhere;
+          word-break: break-word;
+          overflow-x: auto; /* fallback for extremely long tokens */
+          margin: 8px 0 0;
+      }
+      pre > code {
+          display: block;
+          white-space: inherit;
+          overflow-wrap: inherit;
+          word-break: inherit;
+          inline-size: min(100%, 120ch);
+      }
+
+      /* MDX content container for docs */
+      .mdx-content {
+          background: #0f131b;
+          border: 1px solid var(--border);
+          border-radius: 10px;
+          padding: 12px;
+          max-height: 400px;
+          overflow-y: auto;
+          margin-top: 8px;
+      }
+  </style>
+</head>
+<body>
+<!-- Hidden targets for the top-level filters -->
+<span id="filter-all"></span>
+<span id="filter-errors"></span>
+<span id="filter-infos"></span>
+<span id="filter-story-errors"></span>
+<span id="filter-doc-errors"></span>
+<span id="filter-docs"></span>
+<header>
+  <div class="wrap">
+    <h1>Manifest Debugger</h1>
+    <div class="summary"><a class="filter-pill all" data-k="all" href="#filter-all">All</a><a class="filter-pill err" data-k="errors" href="#filter-errors">2/17 prop type errors</a><a class="filter-pill info" data-k="infos" href="#filter-infos">17/17 infos</a><span class="filter-pill ok" aria-disabled="true">73 stories ok</span></div>
+  </div>
+</header>
+<main>
+  <div class="wrap">
+    <div class="note info" style="margin-bottom: 16px;">
+            <strong>Tip:</strong> You are using <code>react-docgen</code> (the default). Generation took <strong>0.1s</strong>. For higher quality prop types, consider switching to <code>react-docgen-typescript</code> in your <code>main.ts</code>:
+            <pre><code>typescript: {
+  reactDocgen: 'react-docgen-typescript',
+}</code></pre>
+            Note: <code>react-docgen-typescript</code> can be slower. If performance is acceptable for your project, it generally produces better results.
+            <a href="https://storybook.js.org/docs/api/main-config/main-config-typescript#reactdocgen" target="_blank">Learn more</a>
+          </div>
+    <h2 class="section-title">Components</h2>
+    <div class="grid" role="list">
+      
+<article
+  class="card 
+  no-error 
+  has-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
+  aria-label="Badge">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-ok"></span> Badge</h2>
+      <div class="badges">
+        <label for="c-0-primitives-badge-props" class="badge ok as-toggle">3 prop types</label>
+        <label for="c-0-primitives-badge-info" class="badge info as-toggle">1 info</label>
+        <label for="c-0-primitives-badge-stories" class="badge ok as-toggle">7 stories</label>
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/components/Badge/Badge.stories.tsx">primitives-badge · ./src/components/Badge/Badge.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  
+  <input id="c-0-primitives-badge-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-0-primitives-badge-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  <input id="c-0-primitives-badge-props" class="tg tg-props" type="checkbox" hidden />
+
+  <div class="panels">
+    
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+        <div class="panel panel-props">
+          <div class="note ok">
+            <div class="row">
+              <span class="ex-name">Prop types <small>(react-docgen)</small></span>
+              <span class="badge ok">3 prop types</span>
+            </div>
+            <pre><code>Component: src/components/Badge/Badge.tsx::default</code></pre>
+            <pre><code>Props:</code></pre>
+            <pre><code>children: ReactNode
+
+className?: any = &quot;&quot;
+
+variant?: &quot;primary&quot; | &quot;success&quot; | &quot;warning&quot; | &quot;danger&quot; | &quot;info&quot; | &quot;neutral&quot; = &quot;neutral&quot;</code></pre>
+          </div>
+        </div>
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { Badge } from "fun-ui";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Primary</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Primary = () =&gt; &lt;Badge variant=&quot;primary&quot;&gt;Primary&lt;/Badge&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Success</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Success = () =&gt; &lt;Badge variant=&quot;success&quot;&gt;Success&lt;/Badge&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Warning</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Warning = () =&gt; &lt;Badge variant=&quot;warning&quot;&gt;Warning&lt;/Badge&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Danger</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Danger = () =&gt; &lt;Badge variant=&quot;danger&quot;&gt;Danger&lt;/Badge&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Info</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Info = () =&gt; &lt;Badge variant=&quot;info&quot;&gt;Info&lt;/Badge&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Neutral</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Neutral = () =&gt; &lt;Badge variant=&quot;neutral&quot;&gt;Neutral&lt;/Badge&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">All Variants</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const AllVariants = () =&gt; (
+  &lt;div style={{ display: &quot;flex&quot;, gap: &quot;0.5rem&quot;, flexWrap: &quot;wrap&quot; }}&gt;
+    &lt;Badge variant=&quot;primary&quot;&gt;Primary&lt;/Badge&gt;
+    &lt;Badge variant=&quot;success&quot;&gt;Success&lt;/Badge&gt;
+    &lt;Badge variant=&quot;warning&quot;&gt;Warning&lt;/Badge&gt;
+    &lt;Badge variant=&quot;danger&quot;&gt;Danger&lt;/Badge&gt;
+    &lt;Badge variant=&quot;info&quot;&gt;Info&lt;/Badge&gt;
+    &lt;Badge variant=&quot;neutral&quot;&gt;Neutral&lt;/Badge&gt;
+  &lt;/div&gt;
+);</code></pre>
+            </div>
+        </div>
+    
+  </div>
+</article>
+<article
+  class="card 
+  no-error 
+  has-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
+  aria-label="Button">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-ok"></span> Button</h2>
+      <div class="badges">
+        <label for="c-1-primitives-button-props" class="badge ok as-toggle">4 prop types</label>
+        <label for="c-1-primitives-button-info" class="badge info as-toggle">1 info</label>
+        <label for="c-1-primitives-button-stories" class="badge ok as-toggle">9 stories</label>
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/components/Button/Button.stories.tsx">primitives-button · ./src/components/Button/Button.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  
+  <input id="c-1-primitives-button-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-1-primitives-button-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  <input id="c-1-primitives-button-props" class="tg tg-props" type="checkbox" hidden />
+
+  <div class="panels">
+    
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+        <div class="panel panel-props">
+          <div class="note ok">
+            <div class="row">
+              <span class="ex-name">Prop types <small>(react-docgen)</small></span>
+              <span class="badge ok">4 prop types</span>
+            </div>
+            <pre><code>Component: src/components/Button/Button.tsx::default</code></pre>
+            <pre><code>Props:</code></pre>
+            <pre><code>children: ReactNode
+
+className?: any = &quot;&quot;
+
+size?: &quot;sm&quot; | &quot;md&quot; | &quot;lg&quot; = &quot;md&quot;
+
+variant?: &quot;primary&quot; | &quot;secondary&quot; | &quot;danger&quot; | &quot;ghost&quot; = &quot;primary&quot;</code></pre>
+          </div>
+        </div>
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { Button } from "fun-ui";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Primary</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Primary = () =&gt; &lt;Button variant=&quot;primary&quot;&gt;Primary Button&lt;/Button&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Secondary</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Secondary = () =&gt; &lt;Button variant=&quot;secondary&quot;&gt;Secondary Button&lt;/Button&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Danger</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Danger = () =&gt; &lt;Button variant=&quot;danger&quot;&gt;Delete&lt;/Button&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Ghost</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Ghost = () =&gt; &lt;Button variant=&quot;ghost&quot;&gt;Ghost&lt;/Button&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Small</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Small = () =&gt; &lt;Button size=&quot;sm&quot;&gt;Small&lt;/Button&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Large</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Large = () =&gt; &lt;Button size=&quot;lg&quot;&gt;Large&lt;/Button&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Disabled</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Disabled = () =&gt; &lt;Button disabled&gt;Disabled&lt;/Button&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">All Variants</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const AllVariants = () =&gt; (
+  &lt;div style={{ display: &quot;flex&quot;, gap: &quot;1rem&quot;, flexWrap: &quot;wrap&quot; }}&gt;
+    &lt;Button variant=&quot;primary&quot;&gt;Primary&lt;/Button&gt;
+    &lt;Button variant=&quot;secondary&quot;&gt;Secondary&lt;/Button&gt;
+    &lt;Button variant=&quot;danger&quot;&gt;Danger&lt;/Button&gt;
+    &lt;Button variant=&quot;ghost&quot;&gt;Ghost&lt;/Button&gt;
+  &lt;/div&gt;
+);</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">All Sizes</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const AllSizes = () =&gt; (
+  &lt;div style={{ display: &quot;flex&quot;, gap: &quot;1rem&quot;, alignItems: &quot;center&quot; }}&gt;
+    &lt;Button size=&quot;sm&quot;&gt;Small&lt;/Button&gt;
+    &lt;Button size=&quot;md&quot;&gt;Medium&lt;/Button&gt;
+    &lt;Button size=&quot;lg&quot;&gt;Large&lt;/Button&gt;
+  &lt;/div&gt;
+);</code></pre>
+            </div>
+        </div>
+    
+  </div>
+</article>
+<article
+  class="card 
+  no-error 
+  has-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
+  aria-label="Card">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-ok"></span> Card</h2>
+      <div class="badges">
+        <label for="c-2-primitives-card-props" class="badge ok as-toggle">3 prop types</label>
+        <label for="c-2-primitives-card-info" class="badge info as-toggle">1 info</label>
+        <label for="c-2-primitives-card-stories" class="badge ok as-toggle">3 stories</label>
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/components/Card/Card.stories.tsx">primitives-card · ./src/components/Card/Card.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  
+  <input id="c-2-primitives-card-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-2-primitives-card-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  <input id="c-2-primitives-card-props" class="tg tg-props" type="checkbox" hidden />
+
+  <div class="panels">
+    
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+        <div class="panel panel-props">
+          <div class="note ok">
+            <div class="row">
+              <span class="ex-name">Prop types <small>(react-docgen)</small></span>
+              <span class="badge ok">3 prop types</span>
+            </div>
+            <pre><code>Component: src/components/Card/Card.tsx::default</code></pre>
+            <pre><code>Props:</code></pre>
+            <pre><code>children: ReactNode
+
+className?: any = &quot;&quot;
+
+hover?: boolean = false</code></pre>
+          </div>
+        </div>
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { Card } from "fun-ui";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Default</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Default = () =&gt; &lt;Card&gt;(&lt;div&gt;
+      &lt;h2 style={{ marginTop: 0 }}&gt;Card Title&lt;/h2&gt;
+      &lt;p&gt;This is a basic brutalist card with a heavy border and drop shadow.&lt;/p&gt;
+    &lt;/div&gt;)&lt;/Card&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">With Hover</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const WithHover = () =&gt; &lt;Card hover&gt;(&lt;div&gt;
+      &lt;h2 style={{ marginTop: 0 }}&gt;Hover Me&lt;/h2&gt;
+      &lt;p&gt;This card translates and loses its shadow on hover.&lt;/p&gt;
+    &lt;/div&gt;)&lt;/Card&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Composed</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Composed = () =&gt; (
+  &lt;div style={{ display: &quot;grid&quot;, gridTemplateColumns: &quot;1fr 1fr 1fr&quot;, gap: &quot;1rem&quot; }}&gt;
+    &lt;Card hover&gt;
+      &lt;h3 style={{ marginTop: 0 }}&gt;Feature One&lt;/h3&gt;
+      &lt;p style={{ fontSize: &quot;0.875rem&quot; }}&gt;A feature description goes here.&lt;/p&gt;
+    &lt;/Card&gt;
+    &lt;Card hover&gt;
+      &lt;h3 style={{ marginTop: 0 }}&gt;Feature Two&lt;/h3&gt;
+      &lt;p style={{ fontSize: &quot;0.875rem&quot; }}&gt;Another feature description.&lt;/p&gt;
+    &lt;/Card&gt;
+    &lt;Card hover&gt;
+      &lt;h3 style={{ marginTop: 0 }}&gt;Feature Three&lt;/h3&gt;
+      &lt;p style={{ fontSize: &quot;0.875rem&quot; }}&gt;Yet another feature.&lt;/p&gt;
+    &lt;/Card&gt;
+  &lt;/div&gt;
+);</code></pre>
+            </div>
+        </div>
+    
+  </div>
+</article>
+<article
+  class="card 
+  no-error 
+  has-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
+  aria-label="DataTable">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-ok"></span> DataTable</h2>
+      <div class="badges">
+        <label for="c-3-data-datatable-props" class="badge ok as-toggle">18 prop types</label>
+        <label for="c-3-data-datatable-info" class="badge info as-toggle">1 info</label>
+        <label for="c-3-data-datatable-stories" class="badge ok as-toggle">7 stories</label>
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/components/DataTable/DataTable.stories.tsx">data-datatable · ./src/components/DataTable/DataTable.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  
+  <input id="c-3-data-datatable-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-3-data-datatable-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  <input id="c-3-data-datatable-props" class="tg tg-props" type="checkbox" hidden />
+
+  <div class="panels">
+    
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+        <div class="panel panel-props">
+          <div class="note ok">
+            <div class="row">
+              <span class="ex-name">Prop types <small>(react-docgen)</small></span>
+              <span class="badge ok">18 prop types</span>
+            </div>
+            <pre><code>Component: src/components/DataTable/DataTable.tsx::default</code></pre>
+            <pre><code>Props:</code></pre>
+            <pre><code>className?: string = &quot;&quot;
+
+columns: Column[]
+
+data: DataRow[]
+
+dateBadge?: string
+
+dateSlot?: ReactNode
+
+emptyMessage?: string = &quot;No data available.&quot;
+
+initialSortDirection?: &quot;asc&quot; | &quot;desc&quot; = &quot;desc&quot;
+
+initialSortKey?: string
+
+isLoading?: boolean = false
+
+keyField?: string = &quot;id&quot;
+
+limit?: number
+
+rankField?: string = &quot;rank&quot;
+
+renderLink?: (props: { href: string; children: ReactNode }) =&gt; ReactNode
+
+showRankColors?: boolean = true
+
+subtitle?: string
+
+title?: string
+
+viewAllHref?: string
+
+viewAllText?: string = &quot;View All&quot;</code></pre>
+          </div>
+        </div>
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { DataTable } from "fun-ui";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Default</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Default = () =&gt; &lt;DataTable
+    title=&quot;Season Rankings&quot;
+    subtitle=&quot;2024-25 Season&quot;
+    columns={sampleColumns}
+    data={sampleData}
+    initialSortKey=&quot;points&quot; /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">With Date Badge</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const WithDateBadge = () =&gt; &lt;DataTable
+    title=&quot;Daily Rankings&quot;
+    dateBadge=&quot;Apr 7, 2026&quot;
+    columns={sampleColumns}
+    data={sampleData} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Loading</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Loading = () =&gt; &lt;DataTable title=&quot;Rankings&quot; columns={sampleColumns} data={[]} isLoading /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Empty</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Empty = () =&gt; &lt;DataTable
+    title=&quot;Rankings&quot;
+    columns={sampleColumns}
+    data={[]}
+    emptyMessage=&quot;No rankings data for this date.&quot; /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">With Limit</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const WithLimit = () =&gt; &lt;DataTable
+    title=&quot;Top 3&quot;
+    columns={sampleColumns}
+    data={sampleData}
+    limit={3}
+    viewAllHref=&quot;#&quot;
+    viewAllText=&quot;View All Rankings&quot; /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">No Rank Colors</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const NoRankColors = () =&gt; &lt;DataTable
+    title=&quot;Players&quot;
+    columns={sampleColumns}
+    data={sampleData}
+    showRankColors={false} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Custom Renderers</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const CustomRenderers = () =&gt; &lt;DataTable
+    title=&quot;Custom Cells&quot;
+    columns={[
+      { key: &quot;rank&quot;, header: &quot;#&quot; },
+      {
+        key: &quot;name&quot;,
+        header: &quot;Team&quot;,
+        render: (value: string) =&gt; &lt;strong&gt;{value}&lt;/strong&gt;,
+      },
+      {
+        key: &quot;points&quot;,
+        header: &quot;Points&quot;,
+        sortable: true,
+        render: (value: number) =&gt; (
+          &lt;span className=&quot;brutal-badge bg-[var(--color-brutal-yellow)] text-[var(--color-brutal-black)]&quot;&gt;
+            {value}
+          &lt;/span&gt;
+        ),
+      },
+    ]}
+    data={sampleData.slice(0, 5)} /&gt;;</code></pre>
+            </div>
+        </div>
+    
+  </div>
+</article>
+<article
+  class="card 
+  no-error 
+  has-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
+  aria-label="EmptyState">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-ok"></span> EmptyState</h2>
+      <div class="badges">
+        <label for="c-4-feedback-emptystate-props" class="badge ok as-toggle">4 prop types</label>
+        <label for="c-4-feedback-emptystate-info" class="badge info as-toggle">1 info</label>
+        <label for="c-4-feedback-emptystate-stories" class="badge ok as-toggle">3 stories</label>
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/components/EmptyState/EmptyState.stories.tsx">feedback-emptystate · ./src/components/EmptyState/EmptyState.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  
+  <input id="c-4-feedback-emptystate-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-4-feedback-emptystate-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  <input id="c-4-feedback-emptystate-props" class="tg tg-props" type="checkbox" hidden />
+
+  <div class="panels">
+    
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+        <div class="panel panel-props">
+          <div class="note ok">
+            <div class="row">
+              <span class="ex-name">Prop types <small>(react-docgen)</small></span>
+              <span class="badge ok">4 prop types</span>
+            </div>
+            <pre><code>Component: src/components/EmptyState/EmptyState.tsx::default</code></pre>
+            <pre><code>Props:</code></pre>
+            <pre><code>action?: {
+  label: string;
+  onClick: () =&gt; void;
+}
+
+description?: string
+
+heading: string
+
+icon?: ReactNode</code></pre>
+          </div>
+        </div>
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { EmptyState } from "fun-ui";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Default</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Default = () =&gt; &lt;EmptyState
+    heading=&quot;No data available&quot;
+    description=&quot;There&#39;s nothing to show right now. Check back later.&quot; /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">With Icon</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const WithIcon = () =&gt; &lt;EmptyState
+    icon={&lt;PlaceholderIcon /&gt;}
+    heading=&quot;No games scheduled&quot;
+    description=&quot;There are no games on this date.&quot; /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">With Action</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const WithAction = () =&gt; &lt;EmptyState
+    icon={&lt;PlaceholderIcon /&gt;}
+    heading=&quot;No teams found&quot;
+    description=&quot;Try adjusting your search or filters.&quot;
+    action={{ label: &quot;Reset Filters&quot;, onClick: fn() }} /&gt;;</code></pre>
+            </div>
+        </div>
+    
+  </div>
+</article>
+<article
+  class="card 
+  no-error 
+  has-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
+  aria-label="ErrorBoundary">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-ok"></span> ErrorBoundary</h2>
+      <div class="badges">
+        <label for="c-5-feedback-errorboundary-props" class="badge ok as-toggle">2 prop types</label>
+        <label for="c-5-feedback-errorboundary-info" class="badge info as-toggle">1 info</label>
+        <label for="c-5-feedback-errorboundary-stories" class="badge ok as-toggle">3 stories</label>
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/components/ErrorBoundary/ErrorBoundary.stories.tsx">feedback-errorboundary · ./src/components/ErrorBoundary/ErrorBoundary.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  
+  <input id="c-5-feedback-errorboundary-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-5-feedback-errorboundary-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  <input id="c-5-feedback-errorboundary-props" class="tg tg-props" type="checkbox" hidden />
+
+  <div class="panels">
+    
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+        <div class="panel panel-props">
+          <div class="note ok">
+            <div class="row">
+              <span class="ex-name">Prop types <small>(react-docgen)</small></span>
+              <span class="badge ok">2 prop types</span>
+            </div>
+            <pre><code>Component: src/components/ErrorBoundary/ErrorBoundary.tsx::default</code></pre>
+            <pre><code>Props:</code></pre>
+            <pre><code>children: ReactNode
+
+fallback?: ReactNode</code></pre>
+          </div>
+        </div>
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { ErrorBoundary } from "fun-ui";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Default</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Default = () =&gt; &lt;ErrorBoundary&gt;&lt;p&gt;This content renders normally because no error is thrown.&lt;/p&gt;&lt;/ErrorBoundary&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">With Error</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const WithError = () =&gt; (
+  &lt;ErrorBoundary&gt;
+    &lt;ThrowError /&gt;
+  &lt;/ErrorBoundary&gt;
+);</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Custom Fallback</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const CustomFallback = () =&gt; (
+  &lt;ErrorBoundary
+    fallback={
+      &lt;div className=&quot;brutal-card p-6 text-center&quot;&gt;
+        &lt;h2&gt;Custom Fallback&lt;/h2&gt;
+        &lt;p className=&quot;text-sm&quot;&gt;You can provide your own fallback UI.&lt;/p&gt;
+      &lt;/div&gt;
+    }
+  &gt;
+    &lt;ThrowError /&gt;
+  &lt;/ErrorBoundary&gt;
+);</code></pre>
+            </div>
+        </div>
+    
+  </div>
+</article>
+<article
+  class="card 
+  no-error 
+  has-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
+  aria-label="ErrorMessage">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-ok"></span> ErrorMessage</h2>
+      <div class="badges">
+        <label for="c-6-feedback-errormessage-props" class="badge ok as-toggle">2 prop types</label>
+        <label for="c-6-feedback-errormessage-info" class="badge info as-toggle">1 info</label>
+        <label for="c-6-feedback-errormessage-stories" class="badge ok as-toggle">3 stories</label>
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/components/ErrorMessage/ErrorMessage.stories.tsx">feedback-errormessage · ./src/components/ErrorMessage/ErrorMessage.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  
+  <input id="c-6-feedback-errormessage-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-6-feedback-errormessage-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  <input id="c-6-feedback-errormessage-props" class="tg tg-props" type="checkbox" hidden />
+
+  <div class="panels">
+    
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+        <div class="panel panel-props">
+          <div class="note ok">
+            <div class="row">
+              <span class="ex-name">Prop types <small>(react-docgen)</small></span>
+              <span class="badge ok">2 prop types</span>
+            </div>
+            <pre><code>Component: src/components/ErrorMessage/ErrorMessage.tsx::default</code></pre>
+            <pre><code>Props:</code></pre>
+            <pre><code>message?: string = &quot;An error occurred. Please try again.&quot;
+
+onRetry?: () =&gt; void</code></pre>
+          </div>
+        </div>
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { ErrorMessage } from "fun-ui";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Default</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Default = () =&gt; &lt;ErrorMessage /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Custom Message</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const CustomMessage = () =&gt; &lt;ErrorMessage message=&quot;Failed to load player data.&quot; /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">With Retry</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const WithRetry = () =&gt; &lt;ErrorMessage message=&quot;Network request failed.&quot; onRetry={fn()} /&gt;;</code></pre>
+            </div>
+        </div>
+    
+  </div>
+</article>
+<article
+  class="card 
+  no-error 
+  has-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
+  aria-label="LiveIndicator">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-ok"></span> LiveIndicator</h2>
+      <div class="badges">
+        <label for="c-7-data-liveindicator-props" class="badge ok as-toggle">1 prop type</label>
+        <label for="c-7-data-liveindicator-info" class="badge info as-toggle">1 info</label>
+        <label for="c-7-data-liveindicator-stories" class="badge ok as-toggle">3 stories</label>
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/components/LiveIndicator/LiveIndicator.stories.tsx">data-liveindicator · ./src/components/LiveIndicator/LiveIndicator.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  
+  <input id="c-7-data-liveindicator-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-7-data-liveindicator-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  <input id="c-7-data-liveindicator-props" class="tg tg-props" type="checkbox" hidden />
+
+  <div class="panels">
+    
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+        <div class="panel panel-props">
+          <div class="note ok">
+            <div class="row">
+              <span class="ex-name">Prop types <small>(react-docgen)</small></span>
+              <span class="badge ok">1 prop type</span>
+            </div>
+            <pre><code>Component: src/components/LiveIndicator/LiveIndicator.tsx::default</code></pre>
+            <pre><code>Props:</code></pre>
+            <pre><code>label?: string = &quot;Live&quot;</code></pre>
+          </div>
+        </div>
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { LiveIndicator } from "fun-ui";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Default</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Default = () =&gt; &lt;LiveIndicator /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Custom Label</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const CustomLabel = () =&gt; &lt;LiveIndicator label=&quot;In Progress&quot; /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">In Context</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const InContext = () =&gt; (
+  &lt;div className=&quot;brutal-card p-4 flex items-center justify-between&quot; style={{ maxWidth: 300 }}&gt;
+    &lt;span className=&quot;font-bold uppercase tracking-wider text-sm&quot;&gt;Game Status&lt;/span&gt;
+    &lt;LiveIndicator /&gt;
+  &lt;/div&gt;
+);</code></pre>
+            </div>
+        </div>
+    
+  </div>
+</article>
+<article
+  class="card 
+  no-error 
+  has-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
+  aria-label="LoadingSpinner">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-ok"></span> LoadingSpinner</h2>
+      <div class="badges">
+        <label for="c-8-feedback-loadingspinner-props" class="badge ok as-toggle">2 prop types</label>
+        <label for="c-8-feedback-loadingspinner-info" class="badge info as-toggle">1 info</label>
+        <label for="c-8-feedback-loadingspinner-stories" class="badge ok as-toggle">5 stories</label>
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/components/LoadingSpinner/LoadingSpinner.stories.tsx">feedback-loadingspinner · ./src/components/LoadingSpinner/LoadingSpinner.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  
+  <input id="c-8-feedback-loadingspinner-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-8-feedback-loadingspinner-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  <input id="c-8-feedback-loadingspinner-props" class="tg tg-props" type="checkbox" hidden />
+
+  <div class="panels">
+    
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+        <div class="panel panel-props">
+          <div class="note ok">
+            <div class="row">
+              <span class="ex-name">Prop types <small>(react-docgen)</small></span>
+              <span class="badge ok">2 prop types</span>
+            </div>
+            <pre><code>Component: src/components/LoadingSpinner/LoadingSpinner.tsx::default</code></pre>
+            <pre><code>Props:</code></pre>
+            <pre><code>message?: string = &quot;Loading...&quot;
+
+size?: &quot;small&quot; | &quot;medium&quot; | &quot;large&quot; = &quot;medium&quot;</code></pre>
+          </div>
+        </div>
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { LoadingSpinner } from "fun-ui";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Default</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Default = () =&gt; &lt;LoadingSpinner /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Small</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Small = () =&gt; &lt;LoadingSpinner size=&quot;small&quot; message=&quot;Loading...&quot; /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Large</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Large = () =&gt; &lt;LoadingSpinner size=&quot;large&quot; message=&quot;Crunching data...&quot; /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">No Message</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const NoMessage = () =&gt; &lt;LoadingSpinner message=&quot;&quot; /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">All Sizes</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const AllSizes = () =&gt; (
+  &lt;div style={{ display: &quot;flex&quot;, gap: &quot;3rem&quot;, alignItems: &quot;flex-start&quot; }}&gt;
+    &lt;LoadingSpinner size=&quot;small&quot; message=&quot;Small&quot; /&gt;
+    &lt;LoadingSpinner size=&quot;medium&quot; message=&quot;Medium&quot; /&gt;
+    &lt;LoadingSpinner size=&quot;large&quot; message=&quot;Large&quot; /&gt;
+  &lt;/div&gt;
+);</code></pre>
+            </div>
+        </div>
+    
+  </div>
+</article>
+<article
+  class="card 
+  no-error 
+  has-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
+  aria-label="PageHeader">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-ok"></span> PageHeader</h2>
+      <div class="badges">
+        <label for="c-9-layout-pageheader-props" class="badge ok as-toggle">4 prop types</label>
+        <label for="c-9-layout-pageheader-info" class="badge info as-toggle">1 info</label>
+        <label for="c-9-layout-pageheader-stories" class="badge ok as-toggle">4 stories</label>
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/components/PageHeader/PageHeader.stories.tsx">layout-pageheader · ./src/components/PageHeader/PageHeader.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  
+  <input id="c-9-layout-pageheader-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-9-layout-pageheader-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  <input id="c-9-layout-pageheader-props" class="tg tg-props" type="checkbox" hidden />
+
+  <div class="panels">
+    
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+        <div class="panel panel-props">
+          <div class="note ok">
+            <div class="row">
+              <span class="ex-name">Prop types <small>(react-docgen)</small></span>
+              <span class="badge ok">4 prop types</span>
+            </div>
+            <pre><code>Component: src/components/PageHeader/PageHeader.tsx::default</code></pre>
+            <pre><code>Props:</code></pre>
+            <pre><code>badge?: string
+
+children?: ReactNode
+
+subtitle?: string
+
+title: string</code></pre>
+          </div>
+        </div>
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { Button, PageHeader } from "fun-ui";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Default</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Default = () =&gt; &lt;PageHeader title=&quot;Dashboard&quot; /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">With Subtitle</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const WithSubtitle = () =&gt; &lt;PageHeader title=&quot;Season Rankings&quot; subtitle=&quot;2024-25 Fantasy Hockey Season&quot; /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">With Badge</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const WithBadge = () =&gt; &lt;PageHeader title=&quot;Daily Rankings&quot; subtitle=&quot;Points scored today&quot; badge=&quot;Live&quot; /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">With Children</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const WithChildren = () =&gt; &lt;PageHeader title=&quot;Teams&quot; subtitle=&quot;Manage your fantasy teams&quot;&gt;
+    &lt;Button size=&quot;sm&quot;&gt;Add Team&lt;/Button&gt;
+&lt;/PageHeader&gt;;</code></pre>
+            </div>
+        </div>
+    
+  </div>
+</article>
+<article
+  class="card 
+  has-error 
+  has-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
+  aria-label="Placeholder">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-err"></span> Placeholder</h2>
+      <div class="badges">
+        <label for="c-10-composition-kitchen-sink-err" class="badge err as-toggle">prop type error</label>
+        <label for="c-10-composition-kitchen-sink-info" class="badge info as-toggle">1 info</label>
+        <label for="c-10-composition-kitchen-sink-stories" class="badge ok as-toggle">5 stories</label>
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/components/KitchenSink/KitchenSink.stories.tsx">composition-kitchen-sink · ./src/components/KitchenSink/KitchenSink.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  <input id="c-10-composition-kitchen-sink-err" class="tg tg-err" type="checkbox" hidden />
+  <input id="c-10-composition-kitchen-sink-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-10-composition-kitchen-sink-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  
+
+  <div class="panels">
+    
+        <div class="panel panel-err">
+          
+    <div class="note err">
+      <div class="note-title">Prop type error</div>
+      <div class="note-body"><pre><code>No component file found for the &quot;Placeholder&quot; component.
+  19 | const Placeholder = () =&gt; null;
+  20 |
+&gt; 21 | const meta = {
+     | ^
+  22 |   title: &quot;Composition/Kitchen Sink&quot;,
+  23 |   component: Placeholder,
+  24 | } satisfies Meta&lt;typeof Placeholder&gt;;
+
+./src/components/KitchenSink/KitchenSink.stories.tsx:
+import type { Meta, StoryObj } from &quot;@storybook/react-vite&quot;;
+import { useState } from &quot;react&quot;;
+import Button from &quot;../Button/Button&quot;;
+import Card from &quot;../Card/Card&quot;;
+import Badge from &quot;../Badge/Badge&quot;;
+import LoadingSpinner from &quot;../LoadingSpinner/LoadingSpinner&quot;;
+import ErrorMessage from &quot;../ErrorMessage/ErrorMessage&quot;;
+import PageHeader from &quot;../PageHeader/PageHeader&quot;;
+import TabNavigation from &quot;../TabNavigation/TabNavigation&quot;;
+import StatusBox from &quot;../StatusBox/StatusBox&quot;;
+import EmptyState from &quot;../EmptyState/EmptyState&quot;;
+import StarRating from &quot;../StarRating/StarRating&quot;;
+import DataTable from &quot;../DataTable/DataTable&quot;;
+import StatCard from &quot;../StatCard/StatCard&quot;;
+import LiveIndicator from &quot;../LiveIndicator/LiveIndicator&quot;;
+import Tooltip from &quot;../Tooltip/Tooltip&quot;;
+import type { Column } from &quot;../DataTable/types&quot;;
+
+const Placeholder = () =&gt; null;
+
+const meta = {
+  title: &quot;Composition/Kitchen Sink&quot;,
+  component: Placeholder,
+} satisfies Meta&lt;typeof Placeholder&gt;;
+
+export default meta;
+type Story = StoryObj&lt;typeof meta&gt;;
+
+const columns: Column[] = [
+  { key: &quot;rank&quot;, header: &quot;#&quot; },
+  { key: &quot;name&quot;, header: &quot;Name&quot; },
+  { key: &quot;score&quot;, header: &quot;Score&quot;, sortable: true },
+  { key: &quot;status&quot;, header: &quot;Status&quot; },
+];
+
+const data = [
+  { id: 1, rank: 1, name: &quot;Alpha&quot;, score: 95, status: &quot;Active&quot; },
+  { id: 2, rank: 2, name: &quot;Beta&quot;, score: 88, status: &quot;Active&quot; },
+  { id: 3, rank: 3, name: &quot;Gamma&quot;, score: 76, status: &quot;Inactive&quot; },
+  { id: 4, rank: 4, name: &quot;Delta&quot;, score: 71, status: &quot;Active&quot; },
+  { id: 5, rank: 5, name: &quot;Epsilon&quot;, score: 64, status: &quot;Inactive&quot; },
+];
+
+export const FullPage: Story = {
+  render: () =&gt; {
+    const [tab, setTab] = useState(&quot;overview&quot;);
+    const [rating, setRating] = useState(4);
+
+    return (
+      &lt;div style={{ maxWidth: 900, margin: &quot;0 auto&quot; }}&gt;
+        &lt;PageHeader title=&quot;Dashboard&quot; subtitle=&quot;Project overview&quot; badge=&quot;Beta&quot;&gt;
+          &lt;Button size=&quot;sm&quot; variant=&quot;secondary&quot;&gt;Settings&lt;/Button&gt;
+        &lt;/PageHeader&gt;
+
+        &lt;TabNavigation
+          tabs={[
+            { id: &quot;overview&quot;, label: &quot;Overview&quot; },
+            { id: &quot;rankings&quot;, label: &quot;Rankings&quot; },
+            { id: &quot;feedback&quot;, label: &quot;Feedback&quot; },
+          ]}
+          activeTab={tab}
+          onTabChange={setTab}
+        /&gt;
+
+        {tab === &quot;overview&quot; &amp;&amp; (
+          &lt;div&gt;
+            &lt;div style={{ display: &quot;grid&quot;, gridTemplateColumns: &quot;repeat(3, 1fr)&quot;, gap: &quot;1rem&quot;, marginBottom: &quot;1.5rem&quot; }}&gt;
+              &lt;StatCard label=&quot;Users&quot; value=&quot;1,284&quot; trend=&quot;up&quot; /&gt;
+              &lt;StatCard label=&quot;Revenue&quot; value=&quot;$42k&quot; trend=&quot;up&quot; /&gt;
+              &lt;StatCard label=&quot;Churn&quot; value=&quot;2.1%&quot; trend=&quot;down&quot; /&gt;
+            &lt;/div&gt;
+
+            &lt;div style={{ display: &quot;grid&quot;, gridTemplateColumns: &quot;1fr 1fr&quot;, gap: &quot;1rem&quot;, marginBottom: &quot;1.5rem&quot; }}&gt;
+              &lt;StatusBox title=&quot;API&quot; status=&quot;positive&quot; label=&quot;UP&quot; description=&quot;All systems operational&quot; /&gt;
+              &lt;StatusBox title=&quot;Deploy&quot; status=&quot;info&quot; label=&quot;LIVE&quot; description=&quot;v2.4.1 deployed&quot; /&gt;
+            &lt;/div&gt;
+
+            &lt;Card&gt;
+              &lt;div style={{ display: &quot;flex&quot;, alignItems: &quot;center&quot;, justifyContent: &quot;space-between&quot;, marginBottom: &quot;1rem&quot; }}&gt;
+                &lt;h3 style={{ margin: 0 }}&gt;Activity&lt;/h3&gt;
+                &lt;LiveIndicator /&gt;
+              &lt;/div&gt;
+              &lt;div style={{ display: &quot;flex&quot;, gap: &quot;0.5rem&quot;, flexWrap: &quot;wrap&quot; }}&gt;
+                &lt;Badge variant=&quot;success&quot;&gt;Deployed&lt;/Badge&gt;
+                &lt;Badge variant=&quot;warning&quot;&gt;Review&lt;/Badge&gt;
+                &lt;Badge variant=&quot;primary&quot;&gt;New&lt;/Badge&gt;
+                &lt;Tooltip text=&quot;3 issues need attention&quot;&gt;
+                  &lt;Badge variant=&quot;danger&quot;&gt;3 Issues&lt;/Badge&gt;
+                &lt;/Tooltip&gt;
+              &lt;/div&gt;
+            &lt;/Card&gt;
+          &lt;/div&gt;
+        )}
+
+        {tab === &quot;rankings&quot; &amp;&amp; (
+          &lt;DataTable
+            title=&quot;Leaderboard&quot;
+            subtitle=&quot;Top performers this week&quot;
+            dateBadge=&quot;Apr 7, 2026&quot;
+            columns={columns}
+            data={data}
+            initialSortKey=&quot;score&quot;
+          /&gt;
+        )}
+
+        {tab === &quot;feedback&quot; &amp;&amp; (
+          &lt;Card&gt;
+            &lt;h3 style={{ marginTop: 0 }}&gt;Rate your experience&lt;/h3&gt;
+            &lt;StarRating value={rating} onChange={setRating} /&gt;
+            &lt;p style={{ fontSize: &quot;0.875rem&quot;, marginTop: &quot;0.75rem&quot;, color: &quot;var(--color-brutal-gray)&quot; }}&gt;
+              {rating}/5 stars selected
+            &lt;/p&gt;
+          &lt;/Card&gt;
+        )}
+      &lt;/div&gt;
+    );
+  },
+};
+
+export const LoadingState: Story = {
+  render: () =&gt; (
+    &lt;div style={{ maxWidth: 900, margin: &quot;0 auto&quot; }}&gt;
+      &lt;PageHeader title=&quot;Rankings&quot; subtitle=&quot;Loading data...&quot; /&gt;
+      &lt;DataTable
+        title=&quot;Season Rankings&quot;
+        columns={columns}
+        data={[]}
+        isLoading
+      /&gt;
+    &lt;/div&gt;
+  ),
+};
+
+export const ErrorState: Story = {
+  render: () =&gt; (
+    &lt;div style={{ maxWidth: 900, margin: &quot;0 auto&quot; }}&gt;
+      &lt;PageHeader title=&quot;Rankings&quot; /&gt;
+      &lt;ErrorMessage message=&quot;Failed to load ranking data.&quot; onRetry={() =&gt; alert(&quot;Retrying...&quot;)} /&gt;
+    &lt;/div&gt;
+  ),
+};
+
+export const EmptyDataState: Story = {
+  render: () =&gt; (
+    &lt;div style={{ maxWidth: 900, margin: &quot;0 auto&quot; }}&gt;
+      &lt;PageHeader title=&quot;Search Results&quot; /&gt;
+      &lt;Card&gt;
+        &lt;EmptyState
+          heading=&quot;No results found&quot;
+          description=&quot;Try adjusting your search query or filters.&quot;
+          action={{ label: &quot;Clear Filters&quot;, onClick: () =&gt; {} }}
+        /&gt;
+      &lt;/Card&gt;
+    &lt;/div&gt;
+  ),
+};
+
+export const AllButtons: Story = {
+  render: () =&gt; (
+    &lt;div&gt;
+      &lt;h2 style={{ marginBottom: &quot;1rem&quot; }}&gt;Buttons&lt;/h2&gt;
+      &lt;div style={{ display: &quot;flex&quot;, gap: &quot;1rem&quot;, flexWrap: &quot;wrap&quot;, marginBottom: &quot;1.5rem&quot; }}&gt;
+        &lt;Button variant=&quot;primary&quot; size=&quot;sm&quot;&gt;Small Primary&lt;/Button&gt;
+        &lt;Button variant=&quot;primary&quot;&gt;Medium Primary&lt;/Button&gt;
+        &lt;Button variant=&quot;primary&quot; size=&quot;lg&quot;&gt;Large Primary&lt;/Button&gt;
+      &lt;/div&gt;
+      &lt;div style={{ display: &quot;flex&quot;, gap: &quot;1rem&quot;, flexWrap: &quot;wrap&quot;, marginBottom: &quot;1.5rem&quot; }}&gt;
+        &lt;Button variant=&quot;secondary&quot; size=&quot;sm&quot;&gt;Small Secondary&lt;/Button&gt;
+        &lt;Button variant=&quot;secondary&quot;&gt;Medium Secondary&lt;/Button&gt;
+        &lt;Button variant=&quot;secondary&quot; size=&quot;lg&quot;&gt;Large Secondary&lt;/Button&gt;
+      &lt;/div&gt;
+      &lt;div style={{ display: &quot;flex&quot;, gap: &quot;1rem&quot;, flexWrap: &quot;wrap&quot;, marginBottom: &quot;1.5rem&quot; }}&gt;
+        &lt;Button variant=&quot;danger&quot;&gt;Danger&lt;/Button&gt;
+        &lt;Button variant=&quot;ghost&quot;&gt;Ghost&lt;/Button&gt;
+        &lt;Button disabled&gt;Disabled&lt;/Button&gt;
+      &lt;/div&gt;
+
+      &lt;h2 style={{ marginBottom: &quot;1rem&quot; }}&gt;Badges&lt;/h2&gt;
+      &lt;div style={{ display: &quot;flex&quot;, gap: &quot;0.5rem&quot;, flexWrap: &quot;wrap&quot;, marginBottom: &quot;1.5rem&quot; }}&gt;
+        &lt;Badge variant=&quot;primary&quot;&gt;Primary&lt;/Badge&gt;
+        &lt;Badge variant=&quot;success&quot;&gt;Success&lt;/Badge&gt;
+        &lt;Badge variant=&quot;warning&quot;&gt;Warning&lt;/Badge&gt;
+        &lt;Badge variant=&quot;danger&quot;&gt;Danger&lt;/Badge&gt;
+        &lt;Badge variant=&quot;info&quot;&gt;Info&lt;/Badge&gt;
+        &lt;Badge variant=&quot;neutral&quot;&gt;Neutral&lt;/Badge&gt;
+      &lt;/div&gt;
+
+      &lt;h2 style={{ marginBottom: &quot;1rem&quot; }}&gt;Loading&lt;/h2&gt;
+      &lt;div style={{ display: &quot;flex&quot;, gap: &quot;3rem&quot; }}&gt;
+        &lt;LoadingSpinner size=&quot;small&quot; message=&quot;Small&quot; /&gt;
+        &lt;LoadingSpinner size=&quot;medium&quot; message=&quot;Medium&quot; /&gt;
+        &lt;LoadingSpinner size=&quot;large&quot; message=&quot;Large&quot; /&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  ),
+};
+</code></pre></div>
+    </div>
+        </div>
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import {
+    Badge,
+    Button,
+    Card,
+    DataTable,
+    EmptyState,
+    ErrorMessage,
+    LiveIndicator,
+    LoadingSpinner,
+    PageHeader,
+    StarRating,
+    StatCard,
+    StatusBox,
+    TabNavigation,
+    Tooltip,
+} from "fun-ui";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Full Page</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const FullPage = () =&gt; {
+  const [tab, setTab] = useState(&quot;overview&quot;);
+  const [rating, setRating] = useState(4);
+
+  return (
+    &lt;div style={{ maxWidth: 900, margin: &quot;0 auto&quot; }}&gt;
+      &lt;PageHeader title=&quot;Dashboard&quot; subtitle=&quot;Project overview&quot; badge=&quot;Beta&quot;&gt;
+        &lt;Button size=&quot;sm&quot; variant=&quot;secondary&quot;&gt;Settings&lt;/Button&gt;
+      &lt;/PageHeader&gt;
+
+      &lt;TabNavigation
+        tabs={[
+          { id: &quot;overview&quot;, label: &quot;Overview&quot; },
+          { id: &quot;rankings&quot;, label: &quot;Rankings&quot; },
+          { id: &quot;feedback&quot;, label: &quot;Feedback&quot; },
+        ]}
+        activeTab={tab}
+        onTabChange={setTab}
+      /&gt;
+
+      {tab === &quot;overview&quot; &amp;&amp; (
+        &lt;div&gt;
+          &lt;div style={{ display: &quot;grid&quot;, gridTemplateColumns: &quot;repeat(3, 1fr)&quot;, gap: &quot;1rem&quot;, marginBottom: &quot;1.5rem&quot; }}&gt;
+            &lt;StatCard label=&quot;Users&quot; value=&quot;1,284&quot; trend=&quot;up&quot; /&gt;
+            &lt;StatCard label=&quot;Revenue&quot; value=&quot;$42k&quot; trend=&quot;up&quot; /&gt;
+            &lt;StatCard label=&quot;Churn&quot; value=&quot;2.1%&quot; trend=&quot;down&quot; /&gt;
+          &lt;/div&gt;
+
+          &lt;div style={{ display: &quot;grid&quot;, gridTemplateColumns: &quot;1fr 1fr&quot;, gap: &quot;1rem&quot;, marginBottom: &quot;1.5rem&quot; }}&gt;
+            &lt;StatusBox title=&quot;API&quot; status=&quot;positive&quot; label=&quot;UP&quot; description=&quot;All systems operational&quot; /&gt;
+            &lt;StatusBox title=&quot;Deploy&quot; status=&quot;info&quot; label=&quot;LIVE&quot; description=&quot;v2.4.1 deployed&quot; /&gt;
+          &lt;/div&gt;
+
+          &lt;Card&gt;
+            &lt;div style={{ display: &quot;flex&quot;, alignItems: &quot;center&quot;, justifyContent: &quot;space-between&quot;, marginBottom: &quot;1rem&quot; }}&gt;
+              &lt;h3 style={{ margin: 0 }}&gt;Activity&lt;/h3&gt;
+              &lt;LiveIndicator /&gt;
+            &lt;/div&gt;
+            &lt;div style={{ display: &quot;flex&quot;, gap: &quot;0.5rem&quot;, flexWrap: &quot;wrap&quot; }}&gt;
+              &lt;Badge variant=&quot;success&quot;&gt;Deployed&lt;/Badge&gt;
+              &lt;Badge variant=&quot;warning&quot;&gt;Review&lt;/Badge&gt;
+              &lt;Badge variant=&quot;primary&quot;&gt;New&lt;/Badge&gt;
+              &lt;Tooltip text=&quot;3 issues need attention&quot;&gt;
+                &lt;Badge variant=&quot;danger&quot;&gt;3 Issues&lt;/Badge&gt;
+              &lt;/Tooltip&gt;
+            &lt;/div&gt;
+          &lt;/Card&gt;
+        &lt;/div&gt;
+      )}
+
+      {tab === &quot;rankings&quot; &amp;&amp; (
+        &lt;DataTable
+          title=&quot;Leaderboard&quot;
+          subtitle=&quot;Top performers this week&quot;
+          dateBadge=&quot;Apr 7, 2026&quot;
+          columns={columns}
+          data={data}
+          initialSortKey=&quot;score&quot;
+        /&gt;
+      )}
+
+      {tab === &quot;feedback&quot; &amp;&amp; (
+        &lt;Card&gt;
+          &lt;h3 style={{ marginTop: 0 }}&gt;Rate your experience&lt;/h3&gt;
+          &lt;StarRating value={rating} onChange={setRating} /&gt;
+          &lt;p style={{ fontSize: &quot;0.875rem&quot;, marginTop: &quot;0.75rem&quot;, color: &quot;var(--color-brutal-gray)&quot; }}&gt;
+            {rating}/5 stars selected
+          &lt;/p&gt;
+        &lt;/Card&gt;
+      )}
+    &lt;/div&gt;
+  );
+};</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Loading State</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const LoadingState = () =&gt; (
+  &lt;div style={{ maxWidth: 900, margin: &quot;0 auto&quot; }}&gt;
+    &lt;PageHeader title=&quot;Rankings&quot; subtitle=&quot;Loading data...&quot; /&gt;
+    &lt;DataTable
+      title=&quot;Season Rankings&quot;
+      columns={columns}
+      data={[]}
+      isLoading
+    /&gt;
+  &lt;/div&gt;
+);</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Error State</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const ErrorState = () =&gt; (
+  &lt;div style={{ maxWidth: 900, margin: &quot;0 auto&quot; }}&gt;
+    &lt;PageHeader title=&quot;Rankings&quot; /&gt;
+    &lt;ErrorMessage message=&quot;Failed to load ranking data.&quot; onRetry={() =&gt; alert(&quot;Retrying...&quot;)} /&gt;
+  &lt;/div&gt;
+);</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Empty Data State</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const EmptyDataState = () =&gt; (
+  &lt;div style={{ maxWidth: 900, margin: &quot;0 auto&quot; }}&gt;
+    &lt;PageHeader title=&quot;Search Results&quot; /&gt;
+    &lt;Card&gt;
+      &lt;EmptyState
+        heading=&quot;No results found&quot;
+        description=&quot;Try adjusting your search query or filters.&quot;
+        action={{ label: &quot;Clear Filters&quot;, onClick: () =&gt; {} }}
+      /&gt;
+    &lt;/Card&gt;
+  &lt;/div&gt;
+);</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">All Buttons</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const AllButtons = () =&gt; (
+  &lt;div&gt;
+    &lt;h2 style={{ marginBottom: &quot;1rem&quot; }}&gt;Buttons&lt;/h2&gt;
+    &lt;div style={{ display: &quot;flex&quot;, gap: &quot;1rem&quot;, flexWrap: &quot;wrap&quot;, marginBottom: &quot;1.5rem&quot; }}&gt;
+      &lt;Button variant=&quot;primary&quot; size=&quot;sm&quot;&gt;Small Primary&lt;/Button&gt;
+      &lt;Button variant=&quot;primary&quot;&gt;Medium Primary&lt;/Button&gt;
+      &lt;Button variant=&quot;primary&quot; size=&quot;lg&quot;&gt;Large Primary&lt;/Button&gt;
+    &lt;/div&gt;
+    &lt;div style={{ display: &quot;flex&quot;, gap: &quot;1rem&quot;, flexWrap: &quot;wrap&quot;, marginBottom: &quot;1.5rem&quot; }}&gt;
+      &lt;Button variant=&quot;secondary&quot; size=&quot;sm&quot;&gt;Small Secondary&lt;/Button&gt;
+      &lt;Button variant=&quot;secondary&quot;&gt;Medium Secondary&lt;/Button&gt;
+      &lt;Button variant=&quot;secondary&quot; size=&quot;lg&quot;&gt;Large Secondary&lt;/Button&gt;
+    &lt;/div&gt;
+    &lt;div style={{ display: &quot;flex&quot;, gap: &quot;1rem&quot;, flexWrap: &quot;wrap&quot;, marginBottom: &quot;1.5rem&quot; }}&gt;
+      &lt;Button variant=&quot;danger&quot;&gt;Danger&lt;/Button&gt;
+      &lt;Button variant=&quot;ghost&quot;&gt;Ghost&lt;/Button&gt;
+      &lt;Button disabled&gt;Disabled&lt;/Button&gt;
+    &lt;/div&gt;
+
+    &lt;h2 style={{ marginBottom: &quot;1rem&quot; }}&gt;Badges&lt;/h2&gt;
+    &lt;div style={{ display: &quot;flex&quot;, gap: &quot;0.5rem&quot;, flexWrap: &quot;wrap&quot;, marginBottom: &quot;1.5rem&quot; }}&gt;
+      &lt;Badge variant=&quot;primary&quot;&gt;Primary&lt;/Badge&gt;
+      &lt;Badge variant=&quot;success&quot;&gt;Success&lt;/Badge&gt;
+      &lt;Badge variant=&quot;warning&quot;&gt;Warning&lt;/Badge&gt;
+      &lt;Badge variant=&quot;danger&quot;&gt;Danger&lt;/Badge&gt;
+      &lt;Badge variant=&quot;info&quot;&gt;Info&lt;/Badge&gt;
+      &lt;Badge variant=&quot;neutral&quot;&gt;Neutral&lt;/Badge&gt;
+    &lt;/div&gt;
+
+    &lt;h2 style={{ marginBottom: &quot;1rem&quot; }}&gt;Loading&lt;/h2&gt;
+    &lt;div style={{ display: &quot;flex&quot;, gap: &quot;3rem&quot; }}&gt;
+      &lt;LoadingSpinner size=&quot;small&quot; message=&quot;Small&quot; /&gt;
+      &lt;LoadingSpinner size=&quot;medium&quot; message=&quot;Medium&quot; /&gt;
+      &lt;LoadingSpinner size=&quot;large&quot; message=&quot;Large&quot; /&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+);</code></pre>
+            </div>
+        </div>
+    
+  </div>
+</article>
+<article
+  class="card 
+  no-error 
+  has-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
+  aria-label="StarRating">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-ok"></span> StarRating</h2>
+      <div class="badges">
+        <label for="c-11-feedback-starrating-props" class="badge ok as-toggle">3 prop types</label>
+        <label for="c-11-feedback-starrating-info" class="badge info as-toggle">1 info</label>
+        <label for="c-11-feedback-starrating-stories" class="badge ok as-toggle">4 stories</label>
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/components/StarRating/StarRating.stories.tsx">feedback-starrating · ./src/components/StarRating/StarRating.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  
+  <input id="c-11-feedback-starrating-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-11-feedback-starrating-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  <input id="c-11-feedback-starrating-props" class="tg tg-props" type="checkbox" hidden />
+
+  <div class="panels">
+    
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+        <div class="panel panel-props">
+          <div class="note ok">
+            <div class="row">
+              <span class="ex-name">Prop types <small>(react-docgen)</small></span>
+              <span class="badge ok">3 prop types</span>
+            </div>
+            <pre><code>Component: src/components/StarRating/StarRating.tsx::default</code></pre>
+            <pre><code>Props:</code></pre>
+            <pre><code>max?: number = 5
+
+onChange: (value: number) =&gt; void
+
+value: number</code></pre>
+          </div>
+        </div>
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { StarRating } from "fun-ui";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Default</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Default = () =&gt; &lt;StarRating value={0} onChange={() =&gt; {}} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">With Value</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const WithValue = () =&gt; &lt;StarRating value={3} onChange={() =&gt; {}} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Interactive</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Interactive = () =&gt; {
+  const [rating, setRating] = useState(0);
+  return (
+    &lt;div&gt;
+      &lt;StarRating value={rating} onChange={setRating} /&gt;
+      &lt;p className=&quot;mt-2 text-sm font-bold uppercase tracking-wider&quot;&gt;
+        {rating &gt; 0 ? `${rating} / 5 stars` : &quot;Click to rate&quot;}
+      &lt;/p&gt;
+    &lt;/div&gt;
+  );
+};</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Ten Stars</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const TenStars = () =&gt; {
+  const [rating, setRating] = useState(0);
+  return &lt;StarRating max={10} value={rating} onChange={setRating} /&gt;;
+};</code></pre>
+            </div>
+        </div>
+    
+  </div>
+</article>
+<article
+  class="card 
+  no-error 
+  has-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
+  aria-label="StatCard">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-ok"></span> StatCard</h2>
+      <div class="badges">
+        <label for="c-12-data-statcard-props" class="badge ok as-toggle">4 prop types</label>
+        <label for="c-12-data-statcard-info" class="badge info as-toggle">1 info</label>
+        <label for="c-12-data-statcard-stories" class="badge ok as-toggle">4 stories</label>
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/components/StatCard/StatCard.stories.tsx">data-statcard · ./src/components/StatCard/StatCard.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  
+  <input id="c-12-data-statcard-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-12-data-statcard-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  <input id="c-12-data-statcard-props" class="tg tg-props" type="checkbox" hidden />
+
+  <div class="panels">
+    
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+        <div class="panel panel-props">
+          <div class="note ok">
+            <div class="row">
+              <span class="ex-name">Prop types <small>(react-docgen)</small></span>
+              <span class="badge ok">4 prop types</span>
+            </div>
+            <pre><code>Component: src/components/StatCard/StatCard.tsx::default</code></pre>
+            <pre><code>Props:</code></pre>
+            <pre><code>icon?: ReactNode
+
+label: string
+
+trend?: &quot;up&quot; | &quot;down&quot; | &quot;neutral&quot;
+
+value: string | number</code></pre>
+          </div>
+        </div>
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { StatCard } from "fun-ui";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Default</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Default = () =&gt; &lt;StatCard label=&quot;Total Points&quot; value={142} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Trend Up</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const TrendUp = () =&gt; &lt;StatCard label=&quot;Goals&quot; value={68} trend=&quot;up&quot; /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Trend Down</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const TrendDown = () =&gt; &lt;StatCard label=&quot;Assists&quot; value={12} trend=&quot;down&quot; /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Grid</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Grid = () =&gt; (
+  &lt;div style={{ display: &quot;grid&quot;, gridTemplateColumns: &quot;repeat(3, 1fr)&quot;, gap: &quot;1rem&quot; }}&gt;
+    &lt;StatCard label=&quot;Goals&quot; value={68} trend=&quot;up&quot; /&gt;
+    &lt;StatCard label=&quot;Assists&quot; value={74} trend=&quot;neutral&quot; /&gt;
+    &lt;StatCard label=&quot;Total Points&quot; value={142} trend=&quot;up&quot; /&gt;
+  &lt;/div&gt;
+);</code></pre>
+            </div>
+        </div>
+    
+  </div>
+</article>
+<article
+  class="card 
+  no-error 
+  has-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
+  aria-label="StatusBox">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-ok"></span> StatusBox</h2>
+      <div class="badges">
+        <label for="c-13-feedback-statusbox-props" class="badge ok as-toggle">4 prop types</label>
+        <label for="c-13-feedback-statusbox-info" class="badge info as-toggle">1 info</label>
+        <label for="c-13-feedback-statusbox-stories" class="badge ok as-toggle">5 stories</label>
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/components/StatusBox/StatusBox.stories.tsx">feedback-statusbox · ./src/components/StatusBox/StatusBox.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  
+  <input id="c-13-feedback-statusbox-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-13-feedback-statusbox-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  <input id="c-13-feedback-statusbox-props" class="tg tg-props" type="checkbox" hidden />
+
+  <div class="panels">
+    
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+        <div class="panel panel-props">
+          <div class="note ok">
+            <div class="row">
+              <span class="ex-name">Prop types <small>(react-docgen)</small></span>
+              <span class="badge ok">4 prop types</span>
+            </div>
+            <pre><code>Component: src/components/StatusBox/StatusBox.tsx::default</code></pre>
+            <pre><code>Props:</code></pre>
+            <pre><code>description?: string
+
+label: string
+
+status: &quot;positive&quot; | &quot;negative&quot; | &quot;warning&quot; | &quot;info&quot;
+
+title: string</code></pre>
+          </div>
+        </div>
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { StatusBox } from "fun-ui";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Positive</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Positive = () =&gt; &lt;StatusBox
+    title=&quot;Lane Swimming&quot;
+    status=&quot;positive&quot;
+    label=&quot;YES&quot;
+    description=&quot;Open until 4:00 PM&quot; /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Negative</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Negative = () =&gt; &lt;StatusBox
+    title=&quot;Kids Pool&quot;
+    status=&quot;negative&quot;
+    label=&quot;NO&quot;
+    description=&quot;Opens at 1:00 PM&quot; /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Warning</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Warning = () =&gt; &lt;StatusBox
+    title=&quot;Members Only&quot;
+    status=&quot;warning&quot;
+    label=&quot;MAYBE&quot;
+    description=&quot;Restricted access until noon&quot; /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Info</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Info = () =&gt; &lt;StatusBox
+    title=&quot;Library&quot;
+    status=&quot;info&quot;
+    label=&quot;OPEN&quot;
+    description=&quot;Closes in 3 hours&quot; /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Grid</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Grid = () =&gt; (
+  &lt;div style={{ display: &quot;grid&quot;, gridTemplateColumns: &quot;1fr 1fr&quot;, gap: &quot;1rem&quot; }}&gt;
+    &lt;StatusBox title=&quot;Lane Swimming&quot; status=&quot;positive&quot; label=&quot;YES&quot; description=&quot;Open now&quot; /&gt;
+    &lt;StatusBox title=&quot;Kids Pool&quot; status=&quot;negative&quot; label=&quot;NO&quot; description=&quot;Closed today&quot; /&gt;
+  &lt;/div&gt;
+);</code></pre>
+            </div>
+        </div>
+    
+  </div>
+</article>
+<article
+  class="card 
+  no-error 
+  has-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
+  aria-label="TabNavigation">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-ok"></span> TabNavigation</h2>
+      <div class="badges">
+        <label for="c-14-navigation-tabnavigation-props" class="badge ok as-toggle">3 prop types</label>
+        <label for="c-14-navigation-tabnavigation-info" class="badge info as-toggle">1 info</label>
+        <label for="c-14-navigation-tabnavigation-stories" class="badge ok as-toggle">3 stories</label>
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/components/TabNavigation/TabNavigation.stories.tsx">navigation-tabnavigation · ./src/components/TabNavigation/TabNavigation.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  
+  <input id="c-14-navigation-tabnavigation-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-14-navigation-tabnavigation-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  <input id="c-14-navigation-tabnavigation-props" class="tg tg-props" type="checkbox" hidden />
+
+  <div class="panels">
+    
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+        <div class="panel panel-props">
+          <div class="note ok">
+            <div class="row">
+              <span class="ex-name">Prop types <small>(react-docgen)</small></span>
+              <span class="badge ok">3 prop types</span>
+            </div>
+            <pre><code>Component: src/components/TabNavigation/TabNavigation.tsx::default</code></pre>
+            <pre><code>Props:</code></pre>
+            <pre><code>activeTab: string
+
+onTabChange: (tabId: string) =&gt; void
+
+tabs: Tab[]</code></pre>
+          </div>
+        </div>
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { TabNavigation } from "fun-ui";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Default</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Default = () =&gt; &lt;TabNavigation
+    tabs={[
+      { id: &quot;status&quot;, label: &quot;Status&quot; },
+      { id: &quot;schedule&quot;, label: &quot;Schedule&quot; },
+      { id: &quot;swimmers&quot;, label: &quot;Swimmers&quot; },
+    ]}
+    activeTab=&quot;status&quot;
+    onTabChange={() =&gt; {}} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Interactive</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Interactive = () =&gt; {
+  const [active, setActive] = useState(&quot;games&quot;);
+  return (
+    &lt;TabNavigation
+      tabs={[
+        { id: &quot;games&quot;, label: &quot;Games&quot; },
+        { id: &quot;rankings&quot;, label: &quot;Rankings&quot; },
+        { id: &quot;teams&quot;, label: &quot;Teams&quot; },
+        { id: &quot;players&quot;, label: &quot;Players&quot; },
+      ]}
+      activeTab={active}
+      onTabChange={setActive}
+    /&gt;
+  );
+};</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Two Tabs</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const TwoTabs = () =&gt; &lt;TabNavigation
+    tabs={[
+      { id: &quot;this-week&quot;, label: &quot;This Week&quot; },
+      { id: &quot;next-week&quot;, label: &quot;Next Week&quot; },
+    ]}
+    activeTab=&quot;this-week&quot;
+    onTabChange={() =&gt; {}} /&gt;;</code></pre>
+            </div>
+        </div>
+    
+  </div>
+</article>
+<article
+  class="card 
+  has-error 
+  has-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
+  aria-label="TokensPage">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-err"></span> TokensPage</h2>
+      <div class="badges">
+        <label for="c-15-tokens-overview-err" class="badge err as-toggle">prop type error</label>
+        <label for="c-15-tokens-overview-info" class="badge info as-toggle">1 info</label>
+        <label for="c-15-tokens-overview-stories" class="badge ok as-toggle">3 stories</label>
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/components/Tokens/Tokens.stories.tsx">tokens-overview · ./src/components/Tokens/Tokens.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  <input id="c-15-tokens-overview-err" class="tg tg-err" type="checkbox" hidden />
+  <input id="c-15-tokens-overview-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-15-tokens-overview-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  
+
+  <div class="panels">
+    
+        <div class="panel panel-err">
+          
+    <div class="note err">
+      <div class="note-title">Prop type error</div>
+      <div class="note-body"><pre><code>No component file found for the &quot;TokensPage&quot; component.
+  38 | const TokensPage = () =&gt; null;
+  39 |
+&gt; 40 | const meta = {
+     | ^
+  41 |   title: &quot;Tokens/Overview&quot;,
+  42 |   component: TokensPage,
+  43 | } satisfies Meta&lt;typeof TokensPage&gt;;
+
+./src/components/Tokens/Tokens.stories.tsx:
+import type { Meta, StoryObj } from &quot;@storybook/react-vite&quot;;
+
+const colors = [
+  { name: &quot;brutal-black&quot;, hex: &quot;#1A1A1A&quot; },
+  { name: &quot;brutal-white&quot;, hex: &quot;#FAFAFA&quot; },
+  { name: &quot;brutal-cream&quot;, hex: &quot;#F5F0E8&quot; },
+  { name: &quot;brutal-blue&quot;, hex: &quot;#2563EB&quot; },
+  { name: &quot;brutal-red&quot;, hex: &quot;#EF4444&quot; },
+  { name: &quot;brutal-yellow&quot;, hex: &quot;#FACC15&quot; },
+  { name: &quot;brutal-green&quot;, hex: &quot;#16A34A&quot; },
+  { name: &quot;brutal-pink&quot;, hex: &quot;#EC4899&quot; },
+  { name: &quot;brutal-teal&quot;, hex: &quot;#14B8A6&quot; },
+  { name: &quot;brutal-orange&quot;, hex: &quot;#F97316&quot; },
+  { name: &quot;brutal-purple&quot;, hex: &quot;#8B5CF6&quot; },
+  { name: &quot;brutal-gray&quot;, hex: &quot;#6B7280&quot; },
+];
+
+const ColorSwatch = ({ name, hex }: { name: string; hex: string }) =&gt; (
+  &lt;div style={{ display: &quot;flex&quot;, alignItems: &quot;center&quot;, gap: &quot;0.75rem&quot;, marginBottom: &quot;0.5rem&quot; }}&gt;
+    &lt;div
+      style={{
+        width: 48,
+        height: 48,
+        backgroundColor: hex,
+        border: &quot;2px solid #1A1A1A&quot;,
+        flexShrink: 0,
+      }}
+    /&gt;
+    &lt;div&gt;
+      &lt;div style={{ fontWeight: 700, fontSize: &quot;0.875rem&quot;, textTransform: &quot;uppercase&quot;, letterSpacing: &quot;0.05em&quot; }}&gt;
+        {name}
+      &lt;/div&gt;
+      &lt;div style={{ fontSize: &quot;0.75rem&quot;, color: &quot;#6B7280&quot;, fontFamily: &quot;monospace&quot; }}&gt;{hex}&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+);
+
+const TokensPage = () =&gt; null;
+
+const meta = {
+  title: &quot;Tokens/Overview&quot;,
+  component: TokensPage,
+} satisfies Meta&lt;typeof TokensPage&gt;;
+
+export default meta;
+type Story = StoryObj&lt;typeof meta&gt;;
+
+export const Colors: Story = {
+  render: () =&gt; (
+    &lt;div&gt;
+      &lt;h2 style={{ marginBottom: &quot;1.5rem&quot; }}&gt;Color Palette&lt;/h2&gt;
+      &lt;div style={{ display: &quot;grid&quot;, gridTemplateColumns: &quot;repeat(3, 1fr)&quot;, gap: &quot;1rem&quot; }}&gt;
+        {colors.map((c) =&gt; (
+          &lt;ColorSwatch key={c.name} {...c} /&gt;
+        ))}
+      &lt;/div&gt;
+    &lt;/div&gt;
+  ),
+};
+
+export const Typography: Story = {
+  render: () =&gt; (
+    &lt;div&gt;
+      &lt;h2 style={{ marginBottom: &quot;1.5rem&quot; }}&gt;Typography&lt;/h2&gt;
+
+      &lt;div style={{ marginBottom: &quot;2rem&quot; }}&gt;
+        &lt;p className=&quot;stat-label&quot; style={{ marginBottom: &quot;0.5rem&quot; }}&gt;Display Font: Space Grotesk&lt;/p&gt;
+        &lt;div style={{ fontFamily: &#39;&quot;Space Grotesk&quot;, sans-serif&#39; }}&gt;
+          &lt;h1&gt;Heading 1 — The Quick Brown Fox&lt;/h1&gt;
+          &lt;h2&gt;Heading 2 — Jumps Over The Lazy Dog&lt;/h2&gt;
+          &lt;h3 style={{ fontWeight: 700, textTransform: &quot;uppercase&quot;, letterSpacing: &quot;0.05em&quot; }}&gt;
+            Heading 3 — Pack My Box With Five Dozen
+          &lt;/h3&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;div style={{ marginBottom: &quot;2rem&quot; }}&gt;
+        &lt;p className=&quot;stat-label&quot; style={{ marginBottom: &quot;0.5rem&quot; }}&gt;Body Font: Inter&lt;/p&gt;
+        &lt;div style={{ fontFamily: &#39;&quot;Inter&quot;, sans-serif&#39; }}&gt;
+          &lt;p style={{ fontSize: &quot;1rem&quot;, lineHeight: 1.6 }}&gt;
+            Body text at 16px. The brutalist aesthetic demands bold borders, hard shadows, and sharp
+            corners — but body text stays readable with Inter&#39;s clean geometry.
+          &lt;/p&gt;
+          &lt;p style={{ fontSize: &quot;0.875rem&quot;, color: &quot;#6B7280&quot;, lineHeight: 1.6 }}&gt;
+            Secondary text at 14px. Used for descriptions, subtitles, and metadata.
+          &lt;/p&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;div&gt;
+        &lt;p className=&quot;stat-label&quot; style={{ marginBottom: &quot;0.5rem&quot; }}&gt;Label Styles&lt;/p&gt;
+        &lt;div style={{ display: &quot;flex&quot;, gap: &quot;2rem&quot;, alignItems: &quot;baseline&quot; }}&gt;
+          &lt;span className=&quot;font-bold uppercase tracking-wider text-sm&quot;&gt;Button / Label&lt;/span&gt;
+          &lt;span className=&quot;stat-label&quot;&gt;Stat Label&lt;/span&gt;
+          &lt;span className=&quot;brutal-badge&quot; style={{ background: &quot;var(--color-brutal-cream)&quot; }}&gt;Badge&lt;/span&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  ),
+};
+
+export const ShadowsAndBorders: Story = {
+  render: () =&gt; (
+    &lt;div&gt;
+      &lt;h2 style={{ marginBottom: &quot;1.5rem&quot; }}&gt;Shadows &amp; Borders&lt;/h2&gt;
+      &lt;div style={{ display: &quot;grid&quot;, gridTemplateColumns: &quot;repeat(3, 1fr)&quot;, gap: &quot;2rem&quot; }}&gt;
+        &lt;div&gt;
+          &lt;div
+            style={{
+              width: &quot;100%&quot;,
+              height: 80,
+              border: &quot;2px solid #1A1A1A&quot;,
+              boxShadow: &quot;4px 4px 0px 0px #1A1A1A&quot;,
+              background: &quot;white&quot;,
+              display: &quot;flex&quot;,
+              alignItems: &quot;center&quot;,
+              justifyContent: &quot;center&quot;,
+            }}
+          &gt;
+            &lt;span className=&quot;stat-label&quot;&gt;shadow-brutal&lt;/span&gt;
+          &lt;/div&gt;
+          &lt;p style={{ fontSize: &quot;0.75rem&quot;, marginTop: &quot;0.5rem&quot;, fontFamily: &quot;monospace&quot;, color: &quot;#6B7280&quot; }}&gt;
+            4px 4px 0px 0px #1A1A1A
+          &lt;/p&gt;
+        &lt;/div&gt;
+        &lt;div&gt;
+          &lt;div
+            style={{
+              width: &quot;100%&quot;,
+              height: 80,
+              border: &quot;2px solid #1A1A1A&quot;,
+              boxShadow: &quot;2px 2px 0px 0px #1A1A1A&quot;,
+              background: &quot;white&quot;,
+              display: &quot;flex&quot;,
+              alignItems: &quot;center&quot;,
+              justifyContent: &quot;center&quot;,
+            }}
+          &gt;
+            &lt;span className=&quot;stat-label&quot;&gt;shadow-brutal-sm&lt;/span&gt;
+          &lt;/div&gt;
+          &lt;p style={{ fontSize: &quot;0.75rem&quot;, marginTop: &quot;0.5rem&quot;, fontFamily: &quot;monospace&quot;, color: &quot;#6B7280&quot; }}&gt;
+            2px 2px 0px 0px #1A1A1A
+          &lt;/p&gt;
+        &lt;/div&gt;
+        &lt;div&gt;
+          &lt;div
+            style={{
+              width: &quot;100%&quot;,
+              height: 80,
+              border: &quot;2px solid #1A1A1A&quot;,
+              background: &quot;white&quot;,
+              display: &quot;flex&quot;,
+              alignItems: &quot;center&quot;,
+              justifyContent: &quot;center&quot;,
+            }}
+          &gt;
+            &lt;span className=&quot;stat-label&quot;&gt;No shadow&lt;/span&gt;
+          &lt;/div&gt;
+          &lt;p style={{ fontSize: &quot;0.75rem&quot;, marginTop: &quot;0.5rem&quot;, fontFamily: &quot;monospace&quot;, color: &quot;#6B7280&quot; }}&gt;
+            border: 2px solid #1A1A1A
+          &lt;/p&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;h3 style={{ marginTop: &quot;2rem&quot;, marginBottom: &quot;1rem&quot;, fontWeight: 700, textTransform: &quot;uppercase&quot;, letterSpacing: &quot;0.05em&quot; }}&gt;
+        Border Widths
+      &lt;/h3&gt;
+      &lt;div style={{ display: &quot;flex&quot;, gap: &quot;2rem&quot;, alignItems: &quot;center&quot; }}&gt;
+        {[1, 2, 3, 4].map((w) =&gt; (
+          &lt;div key={w} style={{ textAlign: &quot;center&quot; }}&gt;
+            &lt;div
+              style={{
+                width: 60,
+                height: 60,
+                border: `${w}px solid #1A1A1A`,
+                background: &quot;white&quot;,
+                display: &quot;flex&quot;,
+                alignItems: &quot;center&quot;,
+                justifyContent: &quot;center&quot;,
+              }}
+            &gt;
+              &lt;span style={{ fontSize: &quot;0.75rem&quot;, fontWeight: 700 }}&gt;{w}px&lt;/span&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+        ))}
+      &lt;/div&gt;
+    &lt;/div&gt;
+  ),
+};
+</code></pre></div>
+    </div>
+        </div>
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { TokensPage } from "fun-ui";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Colors</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Colors = () =&gt; (
+  &lt;div&gt;
+    &lt;h2 style={{ marginBottom: &quot;1.5rem&quot; }}&gt;Color Palette&lt;/h2&gt;
+    &lt;div style={{ display: &quot;grid&quot;, gridTemplateColumns: &quot;repeat(3, 1fr)&quot;, gap: &quot;1rem&quot; }}&gt;
+      {colors.map((c) =&gt; (
+        &lt;ColorSwatch key={c.name} {...c} /&gt;
+      ))}
+    &lt;/div&gt;
+  &lt;/div&gt;
+);</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Typography</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Typography = () =&gt; (
+  &lt;div&gt;
+    &lt;h2 style={{ marginBottom: &quot;1.5rem&quot; }}&gt;Typography&lt;/h2&gt;
+
+    &lt;div style={{ marginBottom: &quot;2rem&quot; }}&gt;
+      &lt;p className=&quot;stat-label&quot; style={{ marginBottom: &quot;0.5rem&quot; }}&gt;Display Font: Space Grotesk&lt;/p&gt;
+      &lt;div style={{ fontFamily: &#39;&quot;Space Grotesk&quot;, sans-serif&#39; }}&gt;
+        &lt;h1&gt;Heading 1 — The Quick Brown Fox&lt;/h1&gt;
+        &lt;h2&gt;Heading 2 — Jumps Over The Lazy Dog&lt;/h2&gt;
+        &lt;h3 style={{ fontWeight: 700, textTransform: &quot;uppercase&quot;, letterSpacing: &quot;0.05em&quot; }}&gt;
+          Heading 3 — Pack My Box With Five Dozen
+        &lt;/h3&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;div style={{ marginBottom: &quot;2rem&quot; }}&gt;
+      &lt;p className=&quot;stat-label&quot; style={{ marginBottom: &quot;0.5rem&quot; }}&gt;Body Font: Inter&lt;/p&gt;
+      &lt;div style={{ fontFamily: &#39;&quot;Inter&quot;, sans-serif&#39; }}&gt;
+        &lt;p style={{ fontSize: &quot;1rem&quot;, lineHeight: 1.6 }}&gt;
+          Body text at 16px. The brutalist aesthetic demands bold borders, hard shadows, and sharp
+          corners — but body text stays readable with Inter&#39;s clean geometry.
+        &lt;/p&gt;
+        &lt;p style={{ fontSize: &quot;0.875rem&quot;, color: &quot;#6B7280&quot;, lineHeight: 1.6 }}&gt;
+          Secondary text at 14px. Used for descriptions, subtitles, and metadata.
+        &lt;/p&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;div&gt;
+      &lt;p className=&quot;stat-label&quot; style={{ marginBottom: &quot;0.5rem&quot; }}&gt;Label Styles&lt;/p&gt;
+      &lt;div style={{ display: &quot;flex&quot;, gap: &quot;2rem&quot;, alignItems: &quot;baseline&quot; }}&gt;
+        &lt;span className=&quot;font-bold uppercase tracking-wider text-sm&quot;&gt;Button / Label&lt;/span&gt;
+        &lt;span className=&quot;stat-label&quot;&gt;Stat Label&lt;/span&gt;
+        &lt;span className=&quot;brutal-badge&quot; style={{ background: &quot;var(--color-brutal-cream)&quot; }}&gt;Badge&lt;/span&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+);</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Shadows And Borders</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const ShadowsAndBorders = () =&gt; (
+  &lt;div&gt;
+    &lt;h2 style={{ marginBottom: &quot;1.5rem&quot; }}&gt;Shadows &amp; Borders&lt;/h2&gt;
+    &lt;div style={{ display: &quot;grid&quot;, gridTemplateColumns: &quot;repeat(3, 1fr)&quot;, gap: &quot;2rem&quot; }}&gt;
+      &lt;div&gt;
+        &lt;div
+          style={{
+            width: &quot;100%&quot;,
+            height: 80,
+            border: &quot;2px solid #1A1A1A&quot;,
+            boxShadow: &quot;4px 4px 0px 0px #1A1A1A&quot;,
+            background: &quot;white&quot;,
+            display: &quot;flex&quot;,
+            alignItems: &quot;center&quot;,
+            justifyContent: &quot;center&quot;,
+          }}
+        &gt;
+          &lt;span className=&quot;stat-label&quot;&gt;shadow-brutal&lt;/span&gt;
+        &lt;/div&gt;
+        &lt;p style={{ fontSize: &quot;0.75rem&quot;, marginTop: &quot;0.5rem&quot;, fontFamily: &quot;monospace&quot;, color: &quot;#6B7280&quot; }}&gt;
+          4px 4px 0px 0px #1A1A1A
+        &lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div&gt;
+        &lt;div
+          style={{
+            width: &quot;100%&quot;,
+            height: 80,
+            border: &quot;2px solid #1A1A1A&quot;,
+            boxShadow: &quot;2px 2px 0px 0px #1A1A1A&quot;,
+            background: &quot;white&quot;,
+            display: &quot;flex&quot;,
+            alignItems: &quot;center&quot;,
+            justifyContent: &quot;center&quot;,
+          }}
+        &gt;
+          &lt;span className=&quot;stat-label&quot;&gt;shadow-brutal-sm&lt;/span&gt;
+        &lt;/div&gt;
+        &lt;p style={{ fontSize: &quot;0.75rem&quot;, marginTop: &quot;0.5rem&quot;, fontFamily: &quot;monospace&quot;, color: &quot;#6B7280&quot; }}&gt;
+          2px 2px 0px 0px #1A1A1A
+        &lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div&gt;
+        &lt;div
+          style={{
+            width: &quot;100%&quot;,
+            height: 80,
+            border: &quot;2px solid #1A1A1A&quot;,
+            background: &quot;white&quot;,
+            display: &quot;flex&quot;,
+            alignItems: &quot;center&quot;,
+            justifyContent: &quot;center&quot;,
+          }}
+        &gt;
+          &lt;span className=&quot;stat-label&quot;&gt;No shadow&lt;/span&gt;
+        &lt;/div&gt;
+        &lt;p style={{ fontSize: &quot;0.75rem&quot;, marginTop: &quot;0.5rem&quot;, fontFamily: &quot;monospace&quot;, color: &quot;#6B7280&quot; }}&gt;
+          border: 2px solid #1A1A1A
+        &lt;/p&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;h3 style={{ marginTop: &quot;2rem&quot;, marginBottom: &quot;1rem&quot;, fontWeight: 700, textTransform: &quot;uppercase&quot;, letterSpacing: &quot;0.05em&quot; }}&gt;
+      Border Widths
+    &lt;/h3&gt;
+    &lt;div style={{ display: &quot;flex&quot;, gap: &quot;2rem&quot;, alignItems: &quot;center&quot; }}&gt;
+      {[1, 2, 3, 4].map((w) =&gt; (
+        &lt;div key={w} style={{ textAlign: &quot;center&quot; }}&gt;
+          &lt;div
+            style={{
+              width: 60,
+              height: 60,
+              border: `${w}px solid #1A1A1A`,
+              background: &quot;white&quot;,
+              display: &quot;flex&quot;,
+              alignItems: &quot;center&quot;,
+              justifyContent: &quot;center&quot;,
+            }}
+          &gt;
+            &lt;span style={{ fontSize: &quot;0.75rem&quot;, fontWeight: 700 }}&gt;{w}px&lt;/span&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      ))}
+    &lt;/div&gt;
+  &lt;/div&gt;
+);</code></pre>
+            </div>
+        </div>
+    
+  </div>
+</article>
+<article
+  class="card 
+  no-error 
+  has-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
+  aria-label="Tooltip">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-ok"></span> Tooltip</h2>
+      <div class="badges">
+        <label for="c-16-data-tooltip-props" class="badge ok as-toggle">2 prop types</label>
+        <label for="c-16-data-tooltip-info" class="badge info as-toggle">1 info</label>
+        <label for="c-16-data-tooltip-stories" class="badge ok as-toggle">2 stories</label>
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/components/Tooltip/Tooltip.stories.tsx">data-tooltip · ./src/components/Tooltip/Tooltip.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  
+  <input id="c-16-data-tooltip-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-16-data-tooltip-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  <input id="c-16-data-tooltip-props" class="tg tg-props" type="checkbox" hidden />
+
+  <div class="panels">
+    
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+        <div class="panel panel-props">
+          <div class="note ok">
+            <div class="row">
+              <span class="ex-name">Prop types <small>(react-docgen)</small></span>
+              <span class="badge ok">2 prop types</span>
+            </div>
+            <pre><code>Component: src/components/Tooltip/Tooltip.tsx::default</code></pre>
+            <pre><code>Props:</code></pre>
+            <pre><code>children: ReactNode
+
+text: string</code></pre>
+          </div>
+        </div>
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { Badge, Tooltip } from "fun-ui";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Default</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Default = () =&gt; &lt;Tooltip text=&quot;This is a tooltip&quot;&gt;&lt;span className=&quot;font-bold uppercase tracking-wider text-sm cursor-help underline&quot;&gt;Hover me&lt;/span&gt;&lt;/Tooltip&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">On Badge</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const OnBadge = () =&gt; (
+  &lt;div style={{ paddingTop: &quot;4rem&quot; }}&gt;
+    &lt;Tooltip text=&quot;3 points scored today&quot;&gt;
+      &lt;Badge variant=&quot;success&quot;&gt;+3 PTS&lt;/Badge&gt;
+    &lt;/Tooltip&gt;
+  &lt;/div&gt;
+);</code></pre>
+            </div>
+        </div>
+    
+  </div>
+</article>
+    </div>
+    <div class="error-groups" role="region" aria-label="Prop type error groups">
+        <section class="group">
+          <input id="no-component-import-found-toggle" class="group-tg" type="checkbox" hidden />
+          <label for="no-component-import-found-toggle" class="group-header">
+            <span class="caret">▸</span>
+            <span class="group-title">No component import found</span>
+            <span class="group-count">2</span>
+          </label>
+          <div class="group-cards">
+<article
+  class="card 
+  has-error 
+  has-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
+  aria-label="Placeholder">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-err"></span> Placeholder</h2>
+      <div class="badges">
+        <label for="c-error-0-composition-kitchen-sink-err" class="badge err as-toggle">prop type error</label>
+        <label for="c-error-0-composition-kitchen-sink-info" class="badge info as-toggle">1 info</label>
+        <label for="c-error-0-composition-kitchen-sink-stories" class="badge ok as-toggle">5 stories</label>
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/components/KitchenSink/KitchenSink.stories.tsx">composition-kitchen-sink · ./src/components/KitchenSink/KitchenSink.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  <input id="c-error-0-composition-kitchen-sink-err" class="tg tg-err" type="checkbox" hidden />
+  <input id="c-error-0-composition-kitchen-sink-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-error-0-composition-kitchen-sink-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  
+
+  <div class="panels">
+    
+        <div class="panel panel-err">
+          
+    <div class="note err">
+      <div class="note-title">Prop type error</div>
+      <div class="note-body"><pre><code>No component file found for the &quot;Placeholder&quot; component.
+  19 | const Placeholder = () =&gt; null;
+  20 |
+&gt; 21 | const meta = {
+     | ^
+  22 |   title: &quot;Composition/Kitchen Sink&quot;,
+  23 |   component: Placeholder,
+  24 | } satisfies Meta&lt;typeof Placeholder&gt;;
+
+./src/components/KitchenSink/KitchenSink.stories.tsx:
+import type { Meta, StoryObj } from &quot;@storybook/react-vite&quot;;
+import { useState } from &quot;react&quot;;
+import Button from &quot;../Button/Button&quot;;
+import Card from &quot;../Card/Card&quot;;
+import Badge from &quot;../Badge/Badge&quot;;
+import LoadingSpinner from &quot;../LoadingSpinner/LoadingSpinner&quot;;
+import ErrorMessage from &quot;../ErrorMessage/ErrorMessage&quot;;
+import PageHeader from &quot;../PageHeader/PageHeader&quot;;
+import TabNavigation from &quot;../TabNavigation/TabNavigation&quot;;
+import StatusBox from &quot;../StatusBox/StatusBox&quot;;
+import EmptyState from &quot;../EmptyState/EmptyState&quot;;
+import StarRating from &quot;../StarRating/StarRating&quot;;
+import DataTable from &quot;../DataTable/DataTable&quot;;
+import StatCard from &quot;../StatCard/StatCard&quot;;
+import LiveIndicator from &quot;../LiveIndicator/LiveIndicator&quot;;
+import Tooltip from &quot;../Tooltip/Tooltip&quot;;
+import type { Column } from &quot;../DataTable/types&quot;;
+
+const Placeholder = () =&gt; null;
+
+const meta = {
+  title: &quot;Composition/Kitchen Sink&quot;,
+  component: Placeholder,
+} satisfies Meta&lt;typeof Placeholder&gt;;
+
+export default meta;
+type Story = StoryObj&lt;typeof meta&gt;;
+
+const columns: Column[] = [
+  { key: &quot;rank&quot;, header: &quot;#&quot; },
+  { key: &quot;name&quot;, header: &quot;Name&quot; },
+  { key: &quot;score&quot;, header: &quot;Score&quot;, sortable: true },
+  { key: &quot;status&quot;, header: &quot;Status&quot; },
+];
+
+const data = [
+  { id: 1, rank: 1, name: &quot;Alpha&quot;, score: 95, status: &quot;Active&quot; },
+  { id: 2, rank: 2, name: &quot;Beta&quot;, score: 88, status: &quot;Active&quot; },
+  { id: 3, rank: 3, name: &quot;Gamma&quot;, score: 76, status: &quot;Inactive&quot; },
+  { id: 4, rank: 4, name: &quot;Delta&quot;, score: 71, status: &quot;Active&quot; },
+  { id: 5, rank: 5, name: &quot;Epsilon&quot;, score: 64, status: &quot;Inactive&quot; },
+];
+
+export const FullPage: Story = {
+  render: () =&gt; {
+    const [tab, setTab] = useState(&quot;overview&quot;);
+    const [rating, setRating] = useState(4);
+
+    return (
+      &lt;div style={{ maxWidth: 900, margin: &quot;0 auto&quot; }}&gt;
+        &lt;PageHeader title=&quot;Dashboard&quot; subtitle=&quot;Project overview&quot; badge=&quot;Beta&quot;&gt;
+          &lt;Button size=&quot;sm&quot; variant=&quot;secondary&quot;&gt;Settings&lt;/Button&gt;
+        &lt;/PageHeader&gt;
+
+        &lt;TabNavigation
+          tabs={[
+            { id: &quot;overview&quot;, label: &quot;Overview&quot; },
+            { id: &quot;rankings&quot;, label: &quot;Rankings&quot; },
+            { id: &quot;feedback&quot;, label: &quot;Feedback&quot; },
+          ]}
+          activeTab={tab}
+          onTabChange={setTab}
+        /&gt;
+
+        {tab === &quot;overview&quot; &amp;&amp; (
+          &lt;div&gt;
+            &lt;div style={{ display: &quot;grid&quot;, gridTemplateColumns: &quot;repeat(3, 1fr)&quot;, gap: &quot;1rem&quot;, marginBottom: &quot;1.5rem&quot; }}&gt;
+              &lt;StatCard label=&quot;Users&quot; value=&quot;1,284&quot; trend=&quot;up&quot; /&gt;
+              &lt;StatCard label=&quot;Revenue&quot; value=&quot;$42k&quot; trend=&quot;up&quot; /&gt;
+              &lt;StatCard label=&quot;Churn&quot; value=&quot;2.1%&quot; trend=&quot;down&quot; /&gt;
+            &lt;/div&gt;
+
+            &lt;div style={{ display: &quot;grid&quot;, gridTemplateColumns: &quot;1fr 1fr&quot;, gap: &quot;1rem&quot;, marginBottom: &quot;1.5rem&quot; }}&gt;
+              &lt;StatusBox title=&quot;API&quot; status=&quot;positive&quot; label=&quot;UP&quot; description=&quot;All systems operational&quot; /&gt;
+              &lt;StatusBox title=&quot;Deploy&quot; status=&quot;info&quot; label=&quot;LIVE&quot; description=&quot;v2.4.1 deployed&quot; /&gt;
+            &lt;/div&gt;
+
+            &lt;Card&gt;
+              &lt;div style={{ display: &quot;flex&quot;, alignItems: &quot;center&quot;, justifyContent: &quot;space-between&quot;, marginBottom: &quot;1rem&quot; }}&gt;
+                &lt;h3 style={{ margin: 0 }}&gt;Activity&lt;/h3&gt;
+                &lt;LiveIndicator /&gt;
+              &lt;/div&gt;
+              &lt;div style={{ display: &quot;flex&quot;, gap: &quot;0.5rem&quot;, flexWrap: &quot;wrap&quot; }}&gt;
+                &lt;Badge variant=&quot;success&quot;&gt;Deployed&lt;/Badge&gt;
+                &lt;Badge variant=&quot;warning&quot;&gt;Review&lt;/Badge&gt;
+                &lt;Badge variant=&quot;primary&quot;&gt;New&lt;/Badge&gt;
+                &lt;Tooltip text=&quot;3 issues need attention&quot;&gt;
+                  &lt;Badge variant=&quot;danger&quot;&gt;3 Issues&lt;/Badge&gt;
+                &lt;/Tooltip&gt;
+              &lt;/div&gt;
+            &lt;/Card&gt;
+          &lt;/div&gt;
+        )}
+
+        {tab === &quot;rankings&quot; &amp;&amp; (
+          &lt;DataTable
+            title=&quot;Leaderboard&quot;
+            subtitle=&quot;Top performers this week&quot;
+            dateBadge=&quot;Apr 7, 2026&quot;
+            columns={columns}
+            data={data}
+            initialSortKey=&quot;score&quot;
+          /&gt;
+        )}
+
+        {tab === &quot;feedback&quot; &amp;&amp; (
+          &lt;Card&gt;
+            &lt;h3 style={{ marginTop: 0 }}&gt;Rate your experience&lt;/h3&gt;
+            &lt;StarRating value={rating} onChange={setRating} /&gt;
+            &lt;p style={{ fontSize: &quot;0.875rem&quot;, marginTop: &quot;0.75rem&quot;, color: &quot;var(--color-brutal-gray)&quot; }}&gt;
+              {rating}/5 stars selected
+            &lt;/p&gt;
+          &lt;/Card&gt;
+        )}
+      &lt;/div&gt;
+    );
+  },
+};
+
+export const LoadingState: Story = {
+  render: () =&gt; (
+    &lt;div style={{ maxWidth: 900, margin: &quot;0 auto&quot; }}&gt;
+      &lt;PageHeader title=&quot;Rankings&quot; subtitle=&quot;Loading data...&quot; /&gt;
+      &lt;DataTable
+        title=&quot;Season Rankings&quot;
+        columns={columns}
+        data={[]}
+        isLoading
+      /&gt;
+    &lt;/div&gt;
+  ),
+};
+
+export const ErrorState: Story = {
+  render: () =&gt; (
+    &lt;div style={{ maxWidth: 900, margin: &quot;0 auto&quot; }}&gt;
+      &lt;PageHeader title=&quot;Rankings&quot; /&gt;
+      &lt;ErrorMessage message=&quot;Failed to load ranking data.&quot; onRetry={() =&gt; alert(&quot;Retrying...&quot;)} /&gt;
+    &lt;/div&gt;
+  ),
+};
+
+export const EmptyDataState: Story = {
+  render: () =&gt; (
+    &lt;div style={{ maxWidth: 900, margin: &quot;0 auto&quot; }}&gt;
+      &lt;PageHeader title=&quot;Search Results&quot; /&gt;
+      &lt;Card&gt;
+        &lt;EmptyState
+          heading=&quot;No results found&quot;
+          description=&quot;Try adjusting your search query or filters.&quot;
+          action={{ label: &quot;Clear Filters&quot;, onClick: () =&gt; {} }}
+        /&gt;
+      &lt;/Card&gt;
+    &lt;/div&gt;
+  ),
+};
+
+export const AllButtons: Story = {
+  render: () =&gt; (
+    &lt;div&gt;
+      &lt;h2 style={{ marginBottom: &quot;1rem&quot; }}&gt;Buttons&lt;/h2&gt;
+      &lt;div style={{ display: &quot;flex&quot;, gap: &quot;1rem&quot;, flexWrap: &quot;wrap&quot;, marginBottom: &quot;1.5rem&quot; }}&gt;
+        &lt;Button variant=&quot;primary&quot; size=&quot;sm&quot;&gt;Small Primary&lt;/Button&gt;
+        &lt;Button variant=&quot;primary&quot;&gt;Medium Primary&lt;/Button&gt;
+        &lt;Button variant=&quot;primary&quot; size=&quot;lg&quot;&gt;Large Primary&lt;/Button&gt;
+      &lt;/div&gt;
+      &lt;div style={{ display: &quot;flex&quot;, gap: &quot;1rem&quot;, flexWrap: &quot;wrap&quot;, marginBottom: &quot;1.5rem&quot; }}&gt;
+        &lt;Button variant=&quot;secondary&quot; size=&quot;sm&quot;&gt;Small Secondary&lt;/Button&gt;
+        &lt;Button variant=&quot;secondary&quot;&gt;Medium Secondary&lt;/Button&gt;
+        &lt;Button variant=&quot;secondary&quot; size=&quot;lg&quot;&gt;Large Secondary&lt;/Button&gt;
+      &lt;/div&gt;
+      &lt;div style={{ display: &quot;flex&quot;, gap: &quot;1rem&quot;, flexWrap: &quot;wrap&quot;, marginBottom: &quot;1.5rem&quot; }}&gt;
+        &lt;Button variant=&quot;danger&quot;&gt;Danger&lt;/Button&gt;
+        &lt;Button variant=&quot;ghost&quot;&gt;Ghost&lt;/Button&gt;
+        &lt;Button disabled&gt;Disabled&lt;/Button&gt;
+      &lt;/div&gt;
+
+      &lt;h2 style={{ marginBottom: &quot;1rem&quot; }}&gt;Badges&lt;/h2&gt;
+      &lt;div style={{ display: &quot;flex&quot;, gap: &quot;0.5rem&quot;, flexWrap: &quot;wrap&quot;, marginBottom: &quot;1.5rem&quot; }}&gt;
+        &lt;Badge variant=&quot;primary&quot;&gt;Primary&lt;/Badge&gt;
+        &lt;Badge variant=&quot;success&quot;&gt;Success&lt;/Badge&gt;
+        &lt;Badge variant=&quot;warning&quot;&gt;Warning&lt;/Badge&gt;
+        &lt;Badge variant=&quot;danger&quot;&gt;Danger&lt;/Badge&gt;
+        &lt;Badge variant=&quot;info&quot;&gt;Info&lt;/Badge&gt;
+        &lt;Badge variant=&quot;neutral&quot;&gt;Neutral&lt;/Badge&gt;
+      &lt;/div&gt;
+
+      &lt;h2 style={{ marginBottom: &quot;1rem&quot; }}&gt;Loading&lt;/h2&gt;
+      &lt;div style={{ display: &quot;flex&quot;, gap: &quot;3rem&quot; }}&gt;
+        &lt;LoadingSpinner size=&quot;small&quot; message=&quot;Small&quot; /&gt;
+        &lt;LoadingSpinner size=&quot;medium&quot; message=&quot;Medium&quot; /&gt;
+        &lt;LoadingSpinner size=&quot;large&quot; message=&quot;Large&quot; /&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  ),
+};
+</code></pre></div>
+    </div>
+        </div>
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import {
+    Badge,
+    Button,
+    Card,
+    DataTable,
+    EmptyState,
+    ErrorMessage,
+    LiveIndicator,
+    LoadingSpinner,
+    PageHeader,
+    StarRating,
+    StatCard,
+    StatusBox,
+    TabNavigation,
+    Tooltip,
+} from "fun-ui";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Full Page</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const FullPage = () =&gt; {
+  const [tab, setTab] = useState(&quot;overview&quot;);
+  const [rating, setRating] = useState(4);
+
+  return (
+    &lt;div style={{ maxWidth: 900, margin: &quot;0 auto&quot; }}&gt;
+      &lt;PageHeader title=&quot;Dashboard&quot; subtitle=&quot;Project overview&quot; badge=&quot;Beta&quot;&gt;
+        &lt;Button size=&quot;sm&quot; variant=&quot;secondary&quot;&gt;Settings&lt;/Button&gt;
+      &lt;/PageHeader&gt;
+
+      &lt;TabNavigation
+        tabs={[
+          { id: &quot;overview&quot;, label: &quot;Overview&quot; },
+          { id: &quot;rankings&quot;, label: &quot;Rankings&quot; },
+          { id: &quot;feedback&quot;, label: &quot;Feedback&quot; },
+        ]}
+        activeTab={tab}
+        onTabChange={setTab}
+      /&gt;
+
+      {tab === &quot;overview&quot; &amp;&amp; (
+        &lt;div&gt;
+          &lt;div style={{ display: &quot;grid&quot;, gridTemplateColumns: &quot;repeat(3, 1fr)&quot;, gap: &quot;1rem&quot;, marginBottom: &quot;1.5rem&quot; }}&gt;
+            &lt;StatCard label=&quot;Users&quot; value=&quot;1,284&quot; trend=&quot;up&quot; /&gt;
+            &lt;StatCard label=&quot;Revenue&quot; value=&quot;$42k&quot; trend=&quot;up&quot; /&gt;
+            &lt;StatCard label=&quot;Churn&quot; value=&quot;2.1%&quot; trend=&quot;down&quot; /&gt;
+          &lt;/div&gt;
+
+          &lt;div style={{ display: &quot;grid&quot;, gridTemplateColumns: &quot;1fr 1fr&quot;, gap: &quot;1rem&quot;, marginBottom: &quot;1.5rem&quot; }}&gt;
+            &lt;StatusBox title=&quot;API&quot; status=&quot;positive&quot; label=&quot;UP&quot; description=&quot;All systems operational&quot; /&gt;
+            &lt;StatusBox title=&quot;Deploy&quot; status=&quot;info&quot; label=&quot;LIVE&quot; description=&quot;v2.4.1 deployed&quot; /&gt;
+          &lt;/div&gt;
+
+          &lt;Card&gt;
+            &lt;div style={{ display: &quot;flex&quot;, alignItems: &quot;center&quot;, justifyContent: &quot;space-between&quot;, marginBottom: &quot;1rem&quot; }}&gt;
+              &lt;h3 style={{ margin: 0 }}&gt;Activity&lt;/h3&gt;
+              &lt;LiveIndicator /&gt;
+            &lt;/div&gt;
+            &lt;div style={{ display: &quot;flex&quot;, gap: &quot;0.5rem&quot;, flexWrap: &quot;wrap&quot; }}&gt;
+              &lt;Badge variant=&quot;success&quot;&gt;Deployed&lt;/Badge&gt;
+              &lt;Badge variant=&quot;warning&quot;&gt;Review&lt;/Badge&gt;
+              &lt;Badge variant=&quot;primary&quot;&gt;New&lt;/Badge&gt;
+              &lt;Tooltip text=&quot;3 issues need attention&quot;&gt;
+                &lt;Badge variant=&quot;danger&quot;&gt;3 Issues&lt;/Badge&gt;
+              &lt;/Tooltip&gt;
+            &lt;/div&gt;
+          &lt;/Card&gt;
+        &lt;/div&gt;
+      )}
+
+      {tab === &quot;rankings&quot; &amp;&amp; (
+        &lt;DataTable
+          title=&quot;Leaderboard&quot;
+          subtitle=&quot;Top performers this week&quot;
+          dateBadge=&quot;Apr 7, 2026&quot;
+          columns={columns}
+          data={data}
+          initialSortKey=&quot;score&quot;
+        /&gt;
+      )}
+
+      {tab === &quot;feedback&quot; &amp;&amp; (
+        &lt;Card&gt;
+          &lt;h3 style={{ marginTop: 0 }}&gt;Rate your experience&lt;/h3&gt;
+          &lt;StarRating value={rating} onChange={setRating} /&gt;
+          &lt;p style={{ fontSize: &quot;0.875rem&quot;, marginTop: &quot;0.75rem&quot;, color: &quot;var(--color-brutal-gray)&quot; }}&gt;
+            {rating}/5 stars selected
+          &lt;/p&gt;
+        &lt;/Card&gt;
+      )}
+    &lt;/div&gt;
+  );
+};</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Loading State</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const LoadingState = () =&gt; (
+  &lt;div style={{ maxWidth: 900, margin: &quot;0 auto&quot; }}&gt;
+    &lt;PageHeader title=&quot;Rankings&quot; subtitle=&quot;Loading data...&quot; /&gt;
+    &lt;DataTable
+      title=&quot;Season Rankings&quot;
+      columns={columns}
+      data={[]}
+      isLoading
+    /&gt;
+  &lt;/div&gt;
+);</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Error State</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const ErrorState = () =&gt; (
+  &lt;div style={{ maxWidth: 900, margin: &quot;0 auto&quot; }}&gt;
+    &lt;PageHeader title=&quot;Rankings&quot; /&gt;
+    &lt;ErrorMessage message=&quot;Failed to load ranking data.&quot; onRetry={() =&gt; alert(&quot;Retrying...&quot;)} /&gt;
+  &lt;/div&gt;
+);</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Empty Data State</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const EmptyDataState = () =&gt; (
+  &lt;div style={{ maxWidth: 900, margin: &quot;0 auto&quot; }}&gt;
+    &lt;PageHeader title=&quot;Search Results&quot; /&gt;
+    &lt;Card&gt;
+      &lt;EmptyState
+        heading=&quot;No results found&quot;
+        description=&quot;Try adjusting your search query or filters.&quot;
+        action={{ label: &quot;Clear Filters&quot;, onClick: () =&gt; {} }}
+      /&gt;
+    &lt;/Card&gt;
+  &lt;/div&gt;
+);</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">All Buttons</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const AllButtons = () =&gt; (
+  &lt;div&gt;
+    &lt;h2 style={{ marginBottom: &quot;1rem&quot; }}&gt;Buttons&lt;/h2&gt;
+    &lt;div style={{ display: &quot;flex&quot;, gap: &quot;1rem&quot;, flexWrap: &quot;wrap&quot;, marginBottom: &quot;1.5rem&quot; }}&gt;
+      &lt;Button variant=&quot;primary&quot; size=&quot;sm&quot;&gt;Small Primary&lt;/Button&gt;
+      &lt;Button variant=&quot;primary&quot;&gt;Medium Primary&lt;/Button&gt;
+      &lt;Button variant=&quot;primary&quot; size=&quot;lg&quot;&gt;Large Primary&lt;/Button&gt;
+    &lt;/div&gt;
+    &lt;div style={{ display: &quot;flex&quot;, gap: &quot;1rem&quot;, flexWrap: &quot;wrap&quot;, marginBottom: &quot;1.5rem&quot; }}&gt;
+      &lt;Button variant=&quot;secondary&quot; size=&quot;sm&quot;&gt;Small Secondary&lt;/Button&gt;
+      &lt;Button variant=&quot;secondary&quot;&gt;Medium Secondary&lt;/Button&gt;
+      &lt;Button variant=&quot;secondary&quot; size=&quot;lg&quot;&gt;Large Secondary&lt;/Button&gt;
+    &lt;/div&gt;
+    &lt;div style={{ display: &quot;flex&quot;, gap: &quot;1rem&quot;, flexWrap: &quot;wrap&quot;, marginBottom: &quot;1.5rem&quot; }}&gt;
+      &lt;Button variant=&quot;danger&quot;&gt;Danger&lt;/Button&gt;
+      &lt;Button variant=&quot;ghost&quot;&gt;Ghost&lt;/Button&gt;
+      &lt;Button disabled&gt;Disabled&lt;/Button&gt;
+    &lt;/div&gt;
+
+    &lt;h2 style={{ marginBottom: &quot;1rem&quot; }}&gt;Badges&lt;/h2&gt;
+    &lt;div style={{ display: &quot;flex&quot;, gap: &quot;0.5rem&quot;, flexWrap: &quot;wrap&quot;, marginBottom: &quot;1.5rem&quot; }}&gt;
+      &lt;Badge variant=&quot;primary&quot;&gt;Primary&lt;/Badge&gt;
+      &lt;Badge variant=&quot;success&quot;&gt;Success&lt;/Badge&gt;
+      &lt;Badge variant=&quot;warning&quot;&gt;Warning&lt;/Badge&gt;
+      &lt;Badge variant=&quot;danger&quot;&gt;Danger&lt;/Badge&gt;
+      &lt;Badge variant=&quot;info&quot;&gt;Info&lt;/Badge&gt;
+      &lt;Badge variant=&quot;neutral&quot;&gt;Neutral&lt;/Badge&gt;
+    &lt;/div&gt;
+
+    &lt;h2 style={{ marginBottom: &quot;1rem&quot; }}&gt;Loading&lt;/h2&gt;
+    &lt;div style={{ display: &quot;flex&quot;, gap: &quot;3rem&quot; }}&gt;
+      &lt;LoadingSpinner size=&quot;small&quot; message=&quot;Small&quot; /&gt;
+      &lt;LoadingSpinner size=&quot;medium&quot; message=&quot;Medium&quot; /&gt;
+      &lt;LoadingSpinner size=&quot;large&quot; message=&quot;Large&quot; /&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+);</code></pre>
+            </div>
+        </div>
+    
+  </div>
+</article>
+<article
+  class="card 
+  has-error 
+  has-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
+  aria-label="TokensPage">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-err"></span> TokensPage</h2>
+      <div class="badges">
+        <label for="c-error-1-tokens-overview-err" class="badge err as-toggle">prop type error</label>
+        <label for="c-error-1-tokens-overview-info" class="badge info as-toggle">1 info</label>
+        <label for="c-error-1-tokens-overview-stories" class="badge ok as-toggle">3 stories</label>
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/components/Tokens/Tokens.stories.tsx">tokens-overview · ./src/components/Tokens/Tokens.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  <input id="c-error-1-tokens-overview-err" class="tg tg-err" type="checkbox" hidden />
+  <input id="c-error-1-tokens-overview-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-error-1-tokens-overview-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  
+
+  <div class="panels">
+    
+        <div class="panel panel-err">
+          
+    <div class="note err">
+      <div class="note-title">Prop type error</div>
+      <div class="note-body"><pre><code>No component file found for the &quot;TokensPage&quot; component.
+  38 | const TokensPage = () =&gt; null;
+  39 |
+&gt; 40 | const meta = {
+     | ^
+  41 |   title: &quot;Tokens/Overview&quot;,
+  42 |   component: TokensPage,
+  43 | } satisfies Meta&lt;typeof TokensPage&gt;;
+
+./src/components/Tokens/Tokens.stories.tsx:
+import type { Meta, StoryObj } from &quot;@storybook/react-vite&quot;;
+
+const colors = [
+  { name: &quot;brutal-black&quot;, hex: &quot;#1A1A1A&quot; },
+  { name: &quot;brutal-white&quot;, hex: &quot;#FAFAFA&quot; },
+  { name: &quot;brutal-cream&quot;, hex: &quot;#F5F0E8&quot; },
+  { name: &quot;brutal-blue&quot;, hex: &quot;#2563EB&quot; },
+  { name: &quot;brutal-red&quot;, hex: &quot;#EF4444&quot; },
+  { name: &quot;brutal-yellow&quot;, hex: &quot;#FACC15&quot; },
+  { name: &quot;brutal-green&quot;, hex: &quot;#16A34A&quot; },
+  { name: &quot;brutal-pink&quot;, hex: &quot;#EC4899&quot; },
+  { name: &quot;brutal-teal&quot;, hex: &quot;#14B8A6&quot; },
+  { name: &quot;brutal-orange&quot;, hex: &quot;#F97316&quot; },
+  { name: &quot;brutal-purple&quot;, hex: &quot;#8B5CF6&quot; },
+  { name: &quot;brutal-gray&quot;, hex: &quot;#6B7280&quot; },
+];
+
+const ColorSwatch = ({ name, hex }: { name: string; hex: string }) =&gt; (
+  &lt;div style={{ display: &quot;flex&quot;, alignItems: &quot;center&quot;, gap: &quot;0.75rem&quot;, marginBottom: &quot;0.5rem&quot; }}&gt;
+    &lt;div
+      style={{
+        width: 48,
+        height: 48,
+        backgroundColor: hex,
+        border: &quot;2px solid #1A1A1A&quot;,
+        flexShrink: 0,
+      }}
+    /&gt;
+    &lt;div&gt;
+      &lt;div style={{ fontWeight: 700, fontSize: &quot;0.875rem&quot;, textTransform: &quot;uppercase&quot;, letterSpacing: &quot;0.05em&quot; }}&gt;
+        {name}
+      &lt;/div&gt;
+      &lt;div style={{ fontSize: &quot;0.75rem&quot;, color: &quot;#6B7280&quot;, fontFamily: &quot;monospace&quot; }}&gt;{hex}&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+);
+
+const TokensPage = () =&gt; null;
+
+const meta = {
+  title: &quot;Tokens/Overview&quot;,
+  component: TokensPage,
+} satisfies Meta&lt;typeof TokensPage&gt;;
+
+export default meta;
+type Story = StoryObj&lt;typeof meta&gt;;
+
+export const Colors: Story = {
+  render: () =&gt; (
+    &lt;div&gt;
+      &lt;h2 style={{ marginBottom: &quot;1.5rem&quot; }}&gt;Color Palette&lt;/h2&gt;
+      &lt;div style={{ display: &quot;grid&quot;, gridTemplateColumns: &quot;repeat(3, 1fr)&quot;, gap: &quot;1rem&quot; }}&gt;
+        {colors.map((c) =&gt; (
+          &lt;ColorSwatch key={c.name} {...c} /&gt;
+        ))}
+      &lt;/div&gt;
+    &lt;/div&gt;
+  ),
+};
+
+export const Typography: Story = {
+  render: () =&gt; (
+    &lt;div&gt;
+      &lt;h2 style={{ marginBottom: &quot;1.5rem&quot; }}&gt;Typography&lt;/h2&gt;
+
+      &lt;div style={{ marginBottom: &quot;2rem&quot; }}&gt;
+        &lt;p className=&quot;stat-label&quot; style={{ marginBottom: &quot;0.5rem&quot; }}&gt;Display Font: Space Grotesk&lt;/p&gt;
+        &lt;div style={{ fontFamily: &#39;&quot;Space Grotesk&quot;, sans-serif&#39; }}&gt;
+          &lt;h1&gt;Heading 1 — The Quick Brown Fox&lt;/h1&gt;
+          &lt;h2&gt;Heading 2 — Jumps Over The Lazy Dog&lt;/h2&gt;
+          &lt;h3 style={{ fontWeight: 700, textTransform: &quot;uppercase&quot;, letterSpacing: &quot;0.05em&quot; }}&gt;
+            Heading 3 — Pack My Box With Five Dozen
+          &lt;/h3&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;div style={{ marginBottom: &quot;2rem&quot; }}&gt;
+        &lt;p className=&quot;stat-label&quot; style={{ marginBottom: &quot;0.5rem&quot; }}&gt;Body Font: Inter&lt;/p&gt;
+        &lt;div style={{ fontFamily: &#39;&quot;Inter&quot;, sans-serif&#39; }}&gt;
+          &lt;p style={{ fontSize: &quot;1rem&quot;, lineHeight: 1.6 }}&gt;
+            Body text at 16px. The brutalist aesthetic demands bold borders, hard shadows, and sharp
+            corners — but body text stays readable with Inter&#39;s clean geometry.
+          &lt;/p&gt;
+          &lt;p style={{ fontSize: &quot;0.875rem&quot;, color: &quot;#6B7280&quot;, lineHeight: 1.6 }}&gt;
+            Secondary text at 14px. Used for descriptions, subtitles, and metadata.
+          &lt;/p&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;div&gt;
+        &lt;p className=&quot;stat-label&quot; style={{ marginBottom: &quot;0.5rem&quot; }}&gt;Label Styles&lt;/p&gt;
+        &lt;div style={{ display: &quot;flex&quot;, gap: &quot;2rem&quot;, alignItems: &quot;baseline&quot; }}&gt;
+          &lt;span className=&quot;font-bold uppercase tracking-wider text-sm&quot;&gt;Button / Label&lt;/span&gt;
+          &lt;span className=&quot;stat-label&quot;&gt;Stat Label&lt;/span&gt;
+          &lt;span className=&quot;brutal-badge&quot; style={{ background: &quot;var(--color-brutal-cream)&quot; }}&gt;Badge&lt;/span&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  ),
+};
+
+export const ShadowsAndBorders: Story = {
+  render: () =&gt; (
+    &lt;div&gt;
+      &lt;h2 style={{ marginBottom: &quot;1.5rem&quot; }}&gt;Shadows &amp; Borders&lt;/h2&gt;
+      &lt;div style={{ display: &quot;grid&quot;, gridTemplateColumns: &quot;repeat(3, 1fr)&quot;, gap: &quot;2rem&quot; }}&gt;
+        &lt;div&gt;
+          &lt;div
+            style={{
+              width: &quot;100%&quot;,
+              height: 80,
+              border: &quot;2px solid #1A1A1A&quot;,
+              boxShadow: &quot;4px 4px 0px 0px #1A1A1A&quot;,
+              background: &quot;white&quot;,
+              display: &quot;flex&quot;,
+              alignItems: &quot;center&quot;,
+              justifyContent: &quot;center&quot;,
+            }}
+          &gt;
+            &lt;span className=&quot;stat-label&quot;&gt;shadow-brutal&lt;/span&gt;
+          &lt;/div&gt;
+          &lt;p style={{ fontSize: &quot;0.75rem&quot;, marginTop: &quot;0.5rem&quot;, fontFamily: &quot;monospace&quot;, color: &quot;#6B7280&quot; }}&gt;
+            4px 4px 0px 0px #1A1A1A
+          &lt;/p&gt;
+        &lt;/div&gt;
+        &lt;div&gt;
+          &lt;div
+            style={{
+              width: &quot;100%&quot;,
+              height: 80,
+              border: &quot;2px solid #1A1A1A&quot;,
+              boxShadow: &quot;2px 2px 0px 0px #1A1A1A&quot;,
+              background: &quot;white&quot;,
+              display: &quot;flex&quot;,
+              alignItems: &quot;center&quot;,
+              justifyContent: &quot;center&quot;,
+            }}
+          &gt;
+            &lt;span className=&quot;stat-label&quot;&gt;shadow-brutal-sm&lt;/span&gt;
+          &lt;/div&gt;
+          &lt;p style={{ fontSize: &quot;0.75rem&quot;, marginTop: &quot;0.5rem&quot;, fontFamily: &quot;monospace&quot;, color: &quot;#6B7280&quot; }}&gt;
+            2px 2px 0px 0px #1A1A1A
+          &lt;/p&gt;
+        &lt;/div&gt;
+        &lt;div&gt;
+          &lt;div
+            style={{
+              width: &quot;100%&quot;,
+              height: 80,
+              border: &quot;2px solid #1A1A1A&quot;,
+              background: &quot;white&quot;,
+              display: &quot;flex&quot;,
+              alignItems: &quot;center&quot;,
+              justifyContent: &quot;center&quot;,
+            }}
+          &gt;
+            &lt;span className=&quot;stat-label&quot;&gt;No shadow&lt;/span&gt;
+          &lt;/div&gt;
+          &lt;p style={{ fontSize: &quot;0.75rem&quot;, marginTop: &quot;0.5rem&quot;, fontFamily: &quot;monospace&quot;, color: &quot;#6B7280&quot; }}&gt;
+            border: 2px solid #1A1A1A
+          &lt;/p&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;h3 style={{ marginTop: &quot;2rem&quot;, marginBottom: &quot;1rem&quot;, fontWeight: 700, textTransform: &quot;uppercase&quot;, letterSpacing: &quot;0.05em&quot; }}&gt;
+        Border Widths
+      &lt;/h3&gt;
+      &lt;div style={{ display: &quot;flex&quot;, gap: &quot;2rem&quot;, alignItems: &quot;center&quot; }}&gt;
+        {[1, 2, 3, 4].map((w) =&gt; (
+          &lt;div key={w} style={{ textAlign: &quot;center&quot; }}&gt;
+            &lt;div
+              style={{
+                width: 60,
+                height: 60,
+                border: `${w}px solid #1A1A1A`,
+                background: &quot;white&quot;,
+                display: &quot;flex&quot;,
+                alignItems: &quot;center&quot;,
+                justifyContent: &quot;center&quot;,
+              }}
+            &gt;
+              &lt;span style={{ fontSize: &quot;0.75rem&quot;, fontWeight: 700 }}&gt;{w}px&lt;/span&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+        ))}
+      &lt;/div&gt;
+    &lt;/div&gt;
+  ),
+};
+</code></pre></div>
+    </div>
+        </div>
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { TokensPage } from "fun-ui";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Colors</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Colors = () =&gt; (
+  &lt;div&gt;
+    &lt;h2 style={{ marginBottom: &quot;1.5rem&quot; }}&gt;Color Palette&lt;/h2&gt;
+    &lt;div style={{ display: &quot;grid&quot;, gridTemplateColumns: &quot;repeat(3, 1fr)&quot;, gap: &quot;1rem&quot; }}&gt;
+      {colors.map((c) =&gt; (
+        &lt;ColorSwatch key={c.name} {...c} /&gt;
+      ))}
+    &lt;/div&gt;
+  &lt;/div&gt;
+);</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Typography</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Typography = () =&gt; (
+  &lt;div&gt;
+    &lt;h2 style={{ marginBottom: &quot;1.5rem&quot; }}&gt;Typography&lt;/h2&gt;
+
+    &lt;div style={{ marginBottom: &quot;2rem&quot; }}&gt;
+      &lt;p className=&quot;stat-label&quot; style={{ marginBottom: &quot;0.5rem&quot; }}&gt;Display Font: Space Grotesk&lt;/p&gt;
+      &lt;div style={{ fontFamily: &#39;&quot;Space Grotesk&quot;, sans-serif&#39; }}&gt;
+        &lt;h1&gt;Heading 1 — The Quick Brown Fox&lt;/h1&gt;
+        &lt;h2&gt;Heading 2 — Jumps Over The Lazy Dog&lt;/h2&gt;
+        &lt;h3 style={{ fontWeight: 700, textTransform: &quot;uppercase&quot;, letterSpacing: &quot;0.05em&quot; }}&gt;
+          Heading 3 — Pack My Box With Five Dozen
+        &lt;/h3&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;div style={{ marginBottom: &quot;2rem&quot; }}&gt;
+      &lt;p className=&quot;stat-label&quot; style={{ marginBottom: &quot;0.5rem&quot; }}&gt;Body Font: Inter&lt;/p&gt;
+      &lt;div style={{ fontFamily: &#39;&quot;Inter&quot;, sans-serif&#39; }}&gt;
+        &lt;p style={{ fontSize: &quot;1rem&quot;, lineHeight: 1.6 }}&gt;
+          Body text at 16px. The brutalist aesthetic demands bold borders, hard shadows, and sharp
+          corners — but body text stays readable with Inter&#39;s clean geometry.
+        &lt;/p&gt;
+        &lt;p style={{ fontSize: &quot;0.875rem&quot;, color: &quot;#6B7280&quot;, lineHeight: 1.6 }}&gt;
+          Secondary text at 14px. Used for descriptions, subtitles, and metadata.
+        &lt;/p&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;div&gt;
+      &lt;p className=&quot;stat-label&quot; style={{ marginBottom: &quot;0.5rem&quot; }}&gt;Label Styles&lt;/p&gt;
+      &lt;div style={{ display: &quot;flex&quot;, gap: &quot;2rem&quot;, alignItems: &quot;baseline&quot; }}&gt;
+        &lt;span className=&quot;font-bold uppercase tracking-wider text-sm&quot;&gt;Button / Label&lt;/span&gt;
+        &lt;span className=&quot;stat-label&quot;&gt;Stat Label&lt;/span&gt;
+        &lt;span className=&quot;brutal-badge&quot; style={{ background: &quot;var(--color-brutal-cream)&quot; }}&gt;Badge&lt;/span&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+);</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Shadows And Borders</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const ShadowsAndBorders = () =&gt; (
+  &lt;div&gt;
+    &lt;h2 style={{ marginBottom: &quot;1.5rem&quot; }}&gt;Shadows &amp; Borders&lt;/h2&gt;
+    &lt;div style={{ display: &quot;grid&quot;, gridTemplateColumns: &quot;repeat(3, 1fr)&quot;, gap: &quot;2rem&quot; }}&gt;
+      &lt;div&gt;
+        &lt;div
+          style={{
+            width: &quot;100%&quot;,
+            height: 80,
+            border: &quot;2px solid #1A1A1A&quot;,
+            boxShadow: &quot;4px 4px 0px 0px #1A1A1A&quot;,
+            background: &quot;white&quot;,
+            display: &quot;flex&quot;,
+            alignItems: &quot;center&quot;,
+            justifyContent: &quot;center&quot;,
+          }}
+        &gt;
+          &lt;span className=&quot;stat-label&quot;&gt;shadow-brutal&lt;/span&gt;
+        &lt;/div&gt;
+        &lt;p style={{ fontSize: &quot;0.75rem&quot;, marginTop: &quot;0.5rem&quot;, fontFamily: &quot;monospace&quot;, color: &quot;#6B7280&quot; }}&gt;
+          4px 4px 0px 0px #1A1A1A
+        &lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div&gt;
+        &lt;div
+          style={{
+            width: &quot;100%&quot;,
+            height: 80,
+            border: &quot;2px solid #1A1A1A&quot;,
+            boxShadow: &quot;2px 2px 0px 0px #1A1A1A&quot;,
+            background: &quot;white&quot;,
+            display: &quot;flex&quot;,
+            alignItems: &quot;center&quot;,
+            justifyContent: &quot;center&quot;,
+          }}
+        &gt;
+          &lt;span className=&quot;stat-label&quot;&gt;shadow-brutal-sm&lt;/span&gt;
+        &lt;/div&gt;
+        &lt;p style={{ fontSize: &quot;0.75rem&quot;, marginTop: &quot;0.5rem&quot;, fontFamily: &quot;monospace&quot;, color: &quot;#6B7280&quot; }}&gt;
+          2px 2px 0px 0px #1A1A1A
+        &lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div&gt;
+        &lt;div
+          style={{
+            width: &quot;100%&quot;,
+            height: 80,
+            border: &quot;2px solid #1A1A1A&quot;,
+            background: &quot;white&quot;,
+            display: &quot;flex&quot;,
+            alignItems: &quot;center&quot;,
+            justifyContent: &quot;center&quot;,
+          }}
+        &gt;
+          &lt;span className=&quot;stat-label&quot;&gt;No shadow&lt;/span&gt;
+        &lt;/div&gt;
+        &lt;p style={{ fontSize: &quot;0.75rem&quot;, marginTop: &quot;0.5rem&quot;, fontFamily: &quot;monospace&quot;, color: &quot;#6B7280&quot; }}&gt;
+          border: 2px solid #1A1A1A
+        &lt;/p&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;h3 style={{ marginTop: &quot;2rem&quot;, marginBottom: &quot;1rem&quot;, fontWeight: 700, textTransform: &quot;uppercase&quot;, letterSpacing: &quot;0.05em&quot; }}&gt;
+      Border Widths
+    &lt;/h3&gt;
+    &lt;div style={{ display: &quot;flex&quot;, gap: &quot;2rem&quot;, alignItems: &quot;center&quot; }}&gt;
+      {[1, 2, 3, 4].map((w) =&gt; (
+        &lt;div key={w} style={{ textAlign: &quot;center&quot; }}&gt;
+          &lt;div
+            style={{
+              width: 60,
+              height: 60,
+              border: `${w}px solid #1A1A1A`,
+              background: &quot;white&quot;,
+              display: &quot;flex&quot;,
+              alignItems: &quot;center&quot;,
+              justifyContent: &quot;center&quot;,
+            }}
+          &gt;
+            &lt;span style={{ fontSize: &quot;0.75rem&quot;, fontWeight: 700 }}&gt;{w}px&lt;/span&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      ))}
+    &lt;/div&gt;
+  &lt;/div&gt;
+);</code></pre>
+            </div>
+        </div>
+    
+  </div>
+</article></div>
+        </section>
+      </div>
+    
+    
+  </div>
+</main>
+</body>
+</html>  
