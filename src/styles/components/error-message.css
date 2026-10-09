@@ -2,3 +2,6 @@
 .fui-error__message { margin: 0; font-size: 14px; font-weight: 500; }
 .fui-error--code { margin: 0 0 20px; text-align: left; font-family: var(--fui-font-mono); }
 .fui-error--code .fui-error__message { font-size: 12px; font-weight: 400; word-break: break-word; }
+.fui-error__body { min-width: 0; }
+.fui-error__title { margin: 0 0 4px; font-family: var(--fui-font-mono); font-size: 11px; letter-spacing: .07em; text-transform: uppercase; }
+.fui-error__hint { margin: 4px 0 0; color: var(--fui-muted); font-size: 13px; }

@@ -30,3 +30,4 @@ export const AllSizes: Story = {
     </div>
   ),
 };
+export const SkeletonFixedColumns: Story = { args: { variant: "skeleton", count: 4, columns: 2 } };

@@ -1,4 +1,11 @@
-export type SegmentedOption = { value: string; label: string; disabled?: boolean };
+export type SegmentedOption = {
+  value: string; label: string;
+  disabled?: boolean;
+  /** DOM id of the option button, e.g. for a tabpanel's aria-labelledby. */
+  id?: string;
+  /** Id of the controlled element, rendered as aria-controls. */
+  controls?: string;
+};
 
 export type SegmentedProps = {
   options: SegmentedOption[];
@@ -34,6 +41,8 @@ export default function Segmented({
           <button
             type="button"
             key={option.value}
+            id={option.id}
+            aria-controls={option.controls}
             className={`fui-segmented__item${selected ? " is-selected" : ""}`}
             disabled={option.disabled}
             {...(role === "tablist" ? { role: "tab", "aria-selected": selected } : { "aria-pressed": selected })}

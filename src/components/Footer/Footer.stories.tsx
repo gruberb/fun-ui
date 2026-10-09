@@ -40,3 +40,12 @@ export const Simple: Story = {
     author: "fun-ui",
   },
 };
+
+export const CustomPadding: Story = {
+  args: { author: "fun-ui", authorUrl: "https://example.com" },
+  render: (args) => (
+    <div style={{ ["--fui-footer-padding" as string]: "8px 0", ["--fui-footer-link-decoration" as string]: "none" }}>
+      <Footer {...args} />
+    </div>
+  ),
+};

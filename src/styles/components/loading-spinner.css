@@ -6,6 +6,7 @@
 .fui-spinner--large { width: 44px; height: 44px; border-width: 3px; }
 
 .fui-skeleton { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.fui-skeleton--fixed { grid-template-columns: repeat(var(--fui-skeleton-columns), minmax(0, 1fr)); }
 .fui-skeleton__block {
   min-height: 160px; border: 1px solid var(--fui-line);
   background: linear-gradient(90deg, var(--fui-panel), var(--fui-raised), var(--fui-panel)) 0 0 / 200% 100%;

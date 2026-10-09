@@ -50,3 +50,16 @@ export const TwoTabs: Story = {
     onTabChange: () => {},
   },
 };
+
+export const WithPanelWiring: Story = {
+  args: {
+    ariaLabel: "Sections",
+    className: "my-tabs",
+    tabs: [
+      { id: "status", label: "Status", buttonId: "tab-status", controls: "panel-status" },
+      { id: "schedule", label: "Schedule", buttonId: "tab-schedule", controls: "panel-schedule" },
+    ],
+    activeTab: "status",
+    onTabChange: () => {},
+  },
+};

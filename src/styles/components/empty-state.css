@@ -3,3 +3,7 @@
 .fui-empty__icon > svg { width: 100%; height: 100%; }
 .fui-empty__heading { margin: 0 0 4px; font-size: 18px; font-weight: 500; letter-spacing: -.01em; }
 .fui-empty__description { max-width: 380px; margin: 0 auto 16px; color: var(--fui-muted); font-size: 14px; }
+.fui-empty--dashed { display: grid; justify-items: center; align-content: center; padding: 40px 20px; border: 1px dashed var(--fui-line-strong); color: var(--fui-muted); }
+.fui-empty--dashed .fui-empty__heading { font-size: 14px; font-weight: 400; margin: 0; }
+.fui-empty--dashed .fui-empty__description { margin: 6px auto 0; }
+.fui-empty--dashed .fui-btn { margin-top: 16px; }

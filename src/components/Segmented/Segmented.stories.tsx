@@ -33,6 +33,19 @@ export const Tabs: Story = {
   render: (args) => <Controlled {...args} />,
 };
 
+export const TabsWithPanels: Story = {
+  args: {
+    role: "tablist",
+    ariaLabel: "Sections",
+    options: [
+      { value: "a", label: "First", id: "tab-a", controls: "panel-a" },
+      { value: "b", label: "Second", id: "tab-b", controls: "panel-b" },
+    ],
+    value: "a",
+  },
+  render: (args) => <Controlled {...args} />,
+};
+
 export const Stretch: Story = { args: { stretch: true, size: "lg" }, render: (args) => <Controlled {...args} /> };
 
 export const AllVariants: Story = {

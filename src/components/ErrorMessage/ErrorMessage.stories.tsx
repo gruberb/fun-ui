@@ -25,3 +25,12 @@ export const WithRetry: Story = {
     onRetry: fn(),
   },
 };
+
+export const WithTitleAndHint: Story = {
+  args: {
+    title: "Request failed",
+    message: "Could not load standings.",
+    hint: "Check your connection and try again.",
+    onRetry: fn(),
+  },
+};

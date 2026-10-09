@@ -50,3 +50,7 @@ export const WithAction: Story = {
     action: { label: "Reset Filters", onClick: fn() },
   },
 };
+
+export const Dashed: Story = {
+  args: { variant: "dashed", heading: "No entries yet", description: "Entries appear here once added." },
+};
