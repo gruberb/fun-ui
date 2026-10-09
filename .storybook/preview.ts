@@ -1,5 +1,8 @@
 import type { Preview } from "@storybook/react-vite";
-import "../src/styles/globals.css";
+import "@fontsource-variable/archivo";
+import "@fontsource/ibm-plex-mono/400.css";
+import "@fontsource/ibm-plex-mono/500.css";
+import "../src/styles/library.css";
 
 const preview: Preview = {
   parameters: {
@@ -10,18 +13,19 @@ const preview: Preview = {
       },
     },
     backgrounds: {
-      default: "brutal-white",
-      values: [
-        { name: "brutal-white", value: "#FAFAFA" },
-        { name: "brutal-cream", value: "#F5F0E8" },
-        { name: "brutal-black", value: "#1A1A1A" },
-        { name: "white", value: "#FFFFFF" },
-      ],
+      options: {
+        paper: { name: "paper", value: "#f3ecdc" },
+        raised: { name: "raised", value: "#fdfaf2" },
+        ink: { name: "ink", value: "#2a1f33" },
+      },
     },
     layout: "padded",
     a11y: {
       test: "todo",
     },
+  },
+  initialGlobals: {
+    backgrounds: { value: "paper" },
   },
 };
 

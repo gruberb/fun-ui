@@ -1,0 +1,6 @@
+/* Notice: dashed mono status box. */
+
+.fui-notice { margin: 0; padding: 10px 14px; border: 1px dashed var(--fui-line-strong); color: var(--fui-ink-2); font-family: var(--fui-font-mono); font-size: 11.5px; line-height: 1.5; }
+.fui-notice strong { color: inherit; }
+.fui-notice--warn { border-color: var(--fui-warn); color: var(--fui-warn); }
+.fui-notice--error { border-color: var(--fui-loss); color: var(--fui-loss); }

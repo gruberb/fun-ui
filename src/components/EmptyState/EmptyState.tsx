@@ -12,23 +12,12 @@ interface EmptyStateProps {
 
 const EmptyState = ({ icon, heading, description, action }: EmptyStateProps) => {
   return (
-    <div className="text-center py-12 px-4">
-      {icon && (
-        <div className="w-16 h-16 mx-auto mb-4 text-[var(--color-brutal-gray)]/40">
-          {icon}
-        </div>
-      )}
-      <h3 className="text-lg mb-1">{heading}</h3>
-      {description && (
-        <p className="text-sm text-[var(--color-brutal-gray)] max-w-sm mx-auto">
-          {description}
-        </p>
-      )}
+    <div className="fui-empty">
+      {icon && <div className="fui-empty__icon">{icon}</div>}
+      <h3 className="fui-empty__heading">{heading}</h3>
+      {description && <p className="fui-empty__description">{description}</p>}
       {action && (
-        <button
-          onClick={action.onClick}
-          className="brutal-btn brutal-btn-secondary mt-4 px-4 py-2 text-sm"
-        >
+        <button type="button" onClick={action.onClick} className="fui-btn fui-btn--secondary">
           {action.label}
         </button>
       )}

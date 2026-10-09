@@ -1,0 +1,10 @@
+.fui-tabs { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--fui-line); }
+.fui-tabs::-webkit-scrollbar { display: none; }
+.fui-tabs__tab {
+  flex: none; display: inline-flex; align-items: center; gap: 6px; padding: 8px 10px 9px; border: 0; background: none; color: var(--fui-muted);
+  font-family: var(--fui-font-mono); font-size: 11px; letter-spacing: .07em; text-transform: uppercase; box-shadow: inset 0 -2px 0 transparent;
+}
+.fui-tabs__tab:hover { color: var(--fui-ink); }
+.fui-tabs__tab.is-active { color: var(--fui-ink); box-shadow: inset 0 -2px 0 var(--fui-accent); }
+.fui-tabs__icon { display: inline-flex; width: 14px; height: 14px; }
+.fui-tabs__icon > svg { width: 100%; height: 100%; }

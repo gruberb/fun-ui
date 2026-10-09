@@ -1,0 +1,4 @@
+.fui-footer { margin-top: 56px; padding: 24px 0; border-top: 1px solid var(--fui-line); color: var(--fui-muted); }
+.fui-footer__credit { margin: 0; text-align: center; font-family: var(--fui-font-mono); font-size: 11.5px; letter-spacing: .04em; text-transform: uppercase; }
+.fui-footer a { color: var(--fui-ink-2); text-decoration: none; }
+.fui-footer a:hover { color: var(--fui-ink); text-decoration: underline; text-underline-offset: 3px; }

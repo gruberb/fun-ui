@@ -1,0 +1,6 @@
+/* TrendBadge: up / down / flat marker with a count. */
+
+.fui-trend-badge { font-family: var(--fui-font-mono); font-size: 12px; white-space: nowrap; }
+.fui-trend-badge--up { color: var(--fui-win); }
+.fui-trend-badge--down { color: var(--fui-loss); }
+.fui-trend-badge--flat { color: var(--fui-muted); }

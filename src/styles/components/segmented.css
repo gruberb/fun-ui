@@ -1,0 +1,15 @@
+/* Segmented: connected toggle buttons; the selected item is an ink block. */
+
+.fui-segmented { display: inline-flex; border: 1px solid var(--fui-line); background: var(--fui-raised); }
+.fui-segmented__item { display: inline-flex; align-items: center; justify-content: center; min-height: 38px; padding: 0 16px; border: 0; background: transparent; color: var(--fui-muted); font-size: 13px; white-space: nowrap; }
+.fui-segmented__item + .fui-segmented__item { border-left: 1px solid var(--fui-line); }
+.fui-segmented__item:hover:not(:disabled) { color: var(--fui-ink); background: var(--fui-panel); }
+.fui-segmented__item:disabled { opacity: .4; cursor: default; }
+.fui-segmented__item.is-selected { color: var(--fui-on-ink); background: var(--fui-ink); }
+.fui-segmented--lg { height: 48px; }
+.fui-segmented--lg .fui-segmented__item { min-height: 46px; }
+
+@media (max-width: 860px) {
+  .fui-segmented--stretch { width: 100%; }
+  .fui-segmented--stretch .fui-segmented__item { flex: 1; }
+}

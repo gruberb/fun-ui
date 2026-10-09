@@ -15,13 +15,13 @@ export { ProgressBar } from "./components/ProgressBar";
 export { Modal } from "./components/Modal";
 
 // Layout & Navigation
-export { PageHeader } from "./components/PageHeader";
 export { TabNavigation } from "./components/TabNavigation";
 export { Footer } from "./components/Footer";
 
 // Data Display
-export { DataTable } from "./components/DataTable";
-export type { Column, DataRow, DataTableProps } from "./components/DataTable";
 export { StatCard } from "./components/StatCard";
 export { LiveIndicator } from "./components/LiveIndicator";
 export { Tooltip } from "./components/Tooltip";
+
+// Extracted from Punktespiegel (see src/extended.ts)
+export * from "./extended";

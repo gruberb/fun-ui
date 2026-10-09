@@ -9,18 +9,11 @@ interface FooterProps {
 
 const Footer = ({ children, author, authorUrl, className = "" }: FooterProps) => {
   return (
-    <footer
-      className={`mt-auto border-t-2 border-[var(--color-brutal-black)] px-6 py-4 ${className}`}
-    >
+    <footer className={`fui-footer ${className}`.trim()}>
       {children || (
-        <p className="text-center text-xs font-bold uppercase tracking-wider text-[var(--color-brutal-gray)]">
+        <p className="fui-footer__credit">
           {authorUrl ? (
-            <a
-              href={authorUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-[var(--color-brutal-black)] transition-colors duration-100"
-            >
+            <a href={authorUrl} target="_blank" rel="noopener noreferrer">
               {author}
             </a>
           ) : (

@@ -7,29 +7,19 @@ interface StatCardProps {
   icon?: ReactNode;
 }
 
-const trendIndicators = {
-  up: { symbol: "\u2191", color: "text-[var(--color-brutal-green)]" },
-  down: { symbol: "\u2193", color: "text-[var(--color-brutal-red)]" },
-  neutral: { symbol: "\u2192", color: "text-[var(--color-brutal-gray)]" },
-};
+const trendSymbol = { up: "↑", down: "↓", neutral: "→" };
 
 const StatCard = ({ label, value, trend, icon }: StatCardProps) => {
   return (
-    <div className="stat-card">
-      <div className="flex items-start justify-between">
-        <div>
-          <div className="stat-label">{label}</div>
-          <div className="stat-value mt-1 flex items-baseline gap-2">
-            {value}
-            {trend && (
-              <span className={`text-sm ${trendIndicators[trend].color}`}>
-                {trendIndicators[trend].symbol}
-              </span>
-            )}
-          </div>
+    <div className="fui-stat">
+      <div className="fui-stat__main">
+        <div className="fui-stat__label fui-label">{label}</div>
+        <div className="fui-stat__value fui-num">
+          {value}
+          {trend && <span className={`fui-stat__trend fui-stat__trend--${trend}`}>{trendSymbol[trend]}</span>}
         </div>
-        {icon && <div className="w-8 h-8 text-[var(--color-brutal-gray)]">{icon}</div>}
       </div>
+      {icon && <div className="fui-stat__icon">{icon}</div>}
     </div>
   );
 };

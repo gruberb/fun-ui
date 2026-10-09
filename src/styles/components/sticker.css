@@ -1,0 +1,21 @@
+/* Sticker and Crosshair: card decorations. Both are absolutely positioned. */
+
+.fui-crosshair { position: absolute; top: 10px; right: 10px; width: 13px; height: 13px; fill: none; stroke: var(--fui-line-strong); stroke-width: 1.2; pointer-events: none; }
+
+.fui-sticker { position: absolute; top: var(--fui-sticker-top, 58px); right: var(--fui-sticker-right, -4px); width: var(--fui-sticker-size, 112px); height: var(--fui-sticker-size, 112px); transform: rotate(-8deg); filter: drop-shadow(0 6px 10px rgba(42, 31, 51, .14)); pointer-events: none; }
+.fui-sticker--ball { transform: rotate(10deg); }
+.fui-sticker--whistle { transform: rotate(-14deg); }
+.fui-sticker__halo { fill: var(--fui-sticker-edge); stroke: var(--fui-sticker-edge); stroke-width: 12; stroke-linejoin: round; }
+.fui-sticker__body { stroke: var(--fui-ink); stroke-width: 3; stroke-linejoin: round; }
+.fui-sticker__ink { fill: var(--fui-ink); stroke: none; }
+.fui-sticker__line { fill: none; stroke: var(--fui-ink); stroke-width: 3; }
+.fui-sticker__glyph { fill: var(--fui-ink); font-family: var(--fui-font-sans); font-size: 44px; font-weight: 700; }
+
+@media (max-width: 600px) {
+  .fui-sticker { --fui-sticker-size: 92px; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .fui-sticker { animation: fui-sticker-float 6s ease-in-out infinite; }
+  @keyframes fui-sticker-float { 50% { translate: 0 -5px; } }
+}

@@ -1,0 +1,7 @@
+/* Popover: portalled tooltip panel. Content helpers: header, title, meta, body. */
+
+.fui-popover { position: fixed; z-index: 100; max-height: calc(100vh - 24px); overflow-y: auto; border: 1px solid var(--fui-ink); background: var(--fui-raised); color: var(--fui-ink); box-shadow: var(--fui-shadow-pop); pointer-events: none; }
+.fui-popover__header { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 10px 12px; border-bottom: 1px solid var(--fui-line); }
+.fui-popover__title { font-size: 14px; font-weight: 600; }
+.fui-popover__meta { color: var(--fui-muted); font-family: var(--fui-font-mono); font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; }
+.fui-popover__body { padding: 12px; font-size: 13px; }

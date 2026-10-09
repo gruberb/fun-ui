@@ -31,9 +31,9 @@ export const CustomFallback: Story = {
   render: () => (
     <ErrorBoundary
       fallback={
-        <div className="brutal-card p-6 text-center">
+        <div className="fui-card" style={{ textAlign: "center" }}>
           <h2>Custom Fallback</h2>
-          <p className="text-sm">You can provide your own fallback UI.</p>
+          <p>You can provide your own fallback UI.</p>
         </div>
       }
     >

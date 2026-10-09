@@ -1,0 +1,5 @@
+.fui-empty { padding: 48px 16px; text-align: center; }
+.fui-empty__icon { width: 56px; height: 56px; margin: 0 auto 16px; color: var(--fui-line-strong); }
+.fui-empty__icon > svg { width: 100%; height: 100%; }
+.fui-empty__heading { margin: 0 0 4px; font-size: 18px; font-weight: 500; letter-spacing: -.01em; }
+.fui-empty__description { max-width: 380px; margin: 0 auto 16px; color: var(--fui-muted); font-size: 14px; }

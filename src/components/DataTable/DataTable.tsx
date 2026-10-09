@@ -1,221 +1,212 @@
-import { useState, useMemo, useRef, useEffect } from "react";
-import type { DataTableProps } from "./types";
-import DataTableHeader from "./DataTableHeader";
-import DataTableEmpty from "./DataTableEmpty";
-import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
+import type { CSSProperties, KeyboardEvent, ReactNode } from "react";
 
-const DataTable = ({
-  data,
-  columns,
-  keyField = "id",
-  rankField = "rank",
-  title,
-  subtitle,
-  limit,
-  viewAllHref,
-  viewAllText = "View All",
-  renderLink,
-  dateBadge,
-  dateSlot,
-  isLoading = false,
-  emptyMessage = "No data available.",
-  className = "",
-  showRankColors = true,
-  initialSortKey,
-  initialSortDirection = "desc",
-}: DataTableProps) => {
-  const tableContainerRef = useRef<HTMLDivElement>(null);
-  const tableRef = useRef<HTMLTableElement>(null);
-  const [isScrollable, setIsScrollable] = useState(false);
-
-  useEffect(() => {
-    const checkScrollable = () => {
-      if (tableContainerRef.current && tableRef.current) {
-        setIsScrollable(tableRef.current.clientWidth > tableContainerRef.current.clientWidth);
-      }
-    };
-    checkScrollable();
-    window.addEventListener("resize", checkScrollable);
-    return () => window.removeEventListener("resize", checkScrollable);
-  }, []);
-
-  const defaultSortKey =
-    initialSortKey ||
-    columns.find((col) => col.sortable)?.key ||
-    columns[0]?.key;
-
-  const [sortKey, setSortKey] = useState<string>(defaultSortKey);
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">(initialSortDirection);
-
-  const handleSort = (key: string) => {
-    if (sortKey === key) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortKey(key);
-      setSortDirection("desc");
-    }
+export type DataTableColumn<Row> = {
+  id: string;
+  label: string;
+  /** Shown instead of `label` on narrow screens. */
+  shortLabel?: string;
+  numeric?: boolean;
+  className?: string;
+  /** CSS width of the column, e.g. "80px". */
+  width?: string;
+  render: (row: Row, index: number) => ReactNode;
+  sort?: {
+    active: boolean;
+    direction: "asc" | "desc";
+    onSort: () => void;
   };
-
-  const getRankColor = (rank: number): string => {
-    if (!showRankColors) return "rank-indicator rank-indicator-default";
-    if (rank === 1) return "rank-indicator rank-indicator-1";
-    if (rank === 2) return "rank-indicator rank-indicator-2";
-    if (rank === 3) return "rank-indicator rank-indicator-3";
-    return "rank-indicator rank-indicator-default";
-  };
-
-  const safeData = useMemo(() => (Array.isArray(data) ? data : []), [data]);
-
-  const displayItems = useMemo(() => {
-    if (safeData.length === 0) return [];
-
-    let result = [...safeData];
-    result.sort((a, b) => {
-      const aValue = a[sortKey];
-      const bValue = b[sortKey];
-      if (typeof aValue === "string" && typeof bValue === "string") {
-        return sortDirection === "asc"
-          ? aValue.localeCompare(bValue)
-          : bValue.localeCompare(aValue);
-      }
-      if (typeof aValue === "number" && typeof bValue === "number") {
-        return sortDirection === "asc" ? aValue - bValue : bValue - aValue;
-      }
-      return 0;
-    });
-
-    if (limit && limit > 0) {
-      result = result.slice(0, limit);
-    }
-    return result;
-  }, [safeData, sortKey, sortDirection, limit]);
-
-  const nameColumnIndex = columns.findIndex((col) => col.key !== rankField);
-  const hasNameColumn = nameColumnIndex !== -1;
-
-  return (
-    <div className={`ranking-table-container ${className}`}>
-      <div className="ranking-table-header">
-        <DataTableHeader
-          title={title}
-          subtitle={subtitle}
-          dateBadge={dateBadge}
-          dateSlot={dateSlot}
-          viewAllHref={viewAllHref}
-          viewAllText={viewAllText}
-          showViewAll={!!limit && safeData.length > limit}
-          renderLink={renderLink}
-        />
-      </div>
-
-      {isLoading && (
-        <div className="p-6">
-          <LoadingSpinner message="Loading data..." />
-        </div>
-      )}
-
-      {!isLoading && safeData.length === 0 && (
-        <div className="p-6">
-          <DataTableEmpty message={emptyMessage} />
-        </div>
-      )}
-
-      {!isLoading && safeData.length > 0 && (
-        <div>
-          <div className="ranking-table-body">
-            <div
-              ref={tableContainerRef}
-              className="overflow-x-auto scrollbar-hide"
-              style={{ position: "relative" }}
-            >
-              <table ref={tableRef} className="ranking-table">
-                <thead>
-                  <tr>
-                    <th className="sticky left-0 z-20 bg-[var(--color-brutal-cream)] text-center">
-                      {columns.find((col) => col.key === rankField)?.header || "Rank"}
-                    </th>
-                    {hasNameColumn && (
-                      <th
-                        className="sticky z-20 border-l border-[var(--color-brutal-cream)] bg-[var(--color-brutal-cream)]"
-                        style={{ left: "65px" }}
-                      >
-                        {columns[nameColumnIndex].header}
-                      </th>
-                    )}
-                    {columns
-                      .filter((col, idx) => col.key !== rankField && idx !== nameColumnIndex)
-                      .map((column) => {
-                        let responsiveClass = "";
-                        if (column.responsive === "md") responsiveClass = "hidden md:table-cell";
-                        else if (column.responsive === "lg") responsiveClass = "hidden lg:table-cell";
-
-                        return (
-                          <th key={column.key} className={`${responsiveClass} ${column.className || ""}`}>
-                            {column.sortable ? (
-                              <button onClick={() => handleSort(column.key)}>
-                                {column.header}
-                                {sortKey === column.key && (
-                                  <span className="ml-1">{sortDirection === "asc" ? "\u2191" : "\u2193"}</span>
-                                )}
-                              </button>
-                            ) : (
-                              column.header
-                            )}
-                          </th>
-                        );
-                      })}
-                  </tr>
-                </thead>
-                <tbody>
-                  {displayItems.map((item, index) => {
-                    const key = item[keyField] || index;
-                    const rankValue = item[rankField] || index + 1;
-
-                    return (
-                      <tr key={key}>
-                        <td className="sticky left-0 z-10 text-center bg-white" style={{ width: "50px" }}>
-                          <div className={getRankColor(Number(rankValue))}>{rankValue}</div>
-                        </td>
-                        {hasNameColumn && (
-                          <td
-                            className="sticky z-10 border-l border-[var(--color-brutal-cream)] bg-white"
-                            style={{ left: "65px" }}
-                          >
-                            {columns[nameColumnIndex].render
-                              ? columns[nameColumnIndex].render(item[columns[nameColumnIndex].key], item, index)
-                              : item[columns[nameColumnIndex].key]}
-                          </td>
-                        )}
-                        {columns
-                          .filter((col, idx) => col.key !== rankField && idx !== nameColumnIndex)
-                          .map((column) => {
-                            const value = item[column.key];
-                            let responsiveClass = "";
-                            if (column.responsive === "md") responsiveClass = "hidden md:table-cell";
-                            else if (column.responsive === "lg") responsiveClass = "hidden lg:table-cell";
-
-                            return (
-                              <td key={column.key} className={`${responsiveClass} ${column.className || ""}`}>
-                                {column.render ? column.render(value, item, index) : value}
-                              </td>
-                            );
-                          })}
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
-          {isScrollable && (
-            <div className="table-scroll-indicator">
-              &harr; Scroll for more
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
 };
 
-export default DataTable;
+export type DataTableFilter = {
+  id: string;
+  label: string;
+  value: string;
+  options: { value: string; label: string }[];
+  onChange: (value: string) => void;
+};
+
+export type DataTableSearch = {
+  value: string;
+  placeholder: string;
+  onChange: (value: string) => void;
+};
+
+export type DataTableProps<Row> = {
+  rows: Row[];
+  columns: DataTableColumn<Row>[];
+  getRowKey: (row: Row) => string;
+  /** Rendered first in the toolbar, e.g. a Segmented control. */
+  leading?: ReactNode;
+  search?: DataTableSearch;
+  /** Visually hidden label of the search input. */
+  searchLabel?: string;
+  filters?: DataTableFilter[];
+  countLabel?: string;
+  emptyMessage?: string;
+  loading?: boolean;
+  /** Minimum table width before the scroll container scrolls sideways. */
+  minWidth?: string;
+  /** Overrides `minWidth` at 860px and below. */
+  mobileMinWidth?: string;
+  /** Bounds the height to this many rows and keeps the header sticky. */
+  maxVisibleRows?: number;
+  variant?: "default" | "compact";
+  ariaLabel?: string;
+  onRowClick?: (row: Row) => void;
+};
+
+// Row heights per variant, used to translate maxVisibleRows into a pixel height.
+const BOUNDS = {
+  default: { head: 56, row: 82, mobileHead: 46, mobileRow: 68 },
+  compact: { head: 44, row: 52, mobileHead: 40, mobileRow: 48 },
+} as const;
+
+export default function DataTable<Row>({
+  rows,
+  columns,
+  getRowKey,
+  leading,
+  search,
+  searchLabel = "Search",
+  filters = [],
+  countLabel,
+  emptyMessage = "No data to show.",
+  loading = false,
+  minWidth = "900px",
+  mobileMinWidth,
+  maxVisibleRows,
+  variant = "default",
+  ariaLabel,
+  onRowClick,
+}: DataTableProps<Row>) {
+  const hasToolbar = Boolean(leading || search || filters.length || countLabel);
+  const bounds = BOUNDS[variant];
+
+  function activateRow(event: KeyboardEvent<HTMLTableRowElement>, row: Row) {
+    if (!onRowClick || (event.key !== "Enter" && event.key !== " ")) return;
+    event.preventDefault();
+    onRowClick(row);
+  }
+
+  return (
+    <section
+      className={`fui-data-table fui-data-table--${variant}${loading ? " is-loading" : ""}`}
+      aria-label={ariaLabel}
+      aria-busy={loading}
+    >
+      {hasToolbar && (
+        <div className="fui-data-table__toolbar">
+          {leading}
+          {search && (
+            <label className="fui-data-table__search">
+              <span className="fui-data-table__search-icon" aria-hidden="true" />
+              <span className="fui-visually-hidden">{searchLabel}</span>
+              <input
+                value={search.value}
+                onChange={(event) => search.onChange(event.target.value)}
+                placeholder={search.placeholder}
+              />
+            </label>
+          )}
+          {filters.map((filter) => (
+            <label className="fui-data-table__filter" key={filter.id}>
+              <span className="fui-visually-hidden">{filter.label}</span>
+              <select
+                aria-label={filter.label}
+                value={filter.value}
+                onChange={(event) => filter.onChange(event.target.value)}
+              >
+                {filter.options.map((option) => (
+                  <option value={option.value} key={option.value}>{option.label}</option>
+                ))}
+              </select>
+            </label>
+          ))}
+          {countLabel && <span className="fui-data-table__count fui-label">{countLabel}</span>}
+        </div>
+      )}
+      <div
+        className={`fui-data-table__scroll${maxVisibleRows ? " is-bounded" : ""}`}
+        style={
+          maxVisibleRows
+            ? ({
+                "--fui-data-table-max-height": `${bounds.head + maxVisibleRows * bounds.row}px`,
+                "--fui-data-table-max-height-mobile": `${bounds.mobileHead + maxVisibleRows * bounds.mobileRow}px`,
+              } as CSSProperties)
+            : undefined
+        }
+      >
+        <table
+          style={
+            {
+              "--fui-data-table-min-width": minWidth,
+              "--fui-data-table-mobile-min-width": mobileMinWidth ?? minWidth,
+            } as CSSProperties
+          }
+        >
+          <colgroup>
+            {columns.map((column) => (
+              <col key={column.id} style={column.width ? { width: column.width } : undefined} />
+            ))}
+          </colgroup>
+          <thead>
+            <tr>
+              {columns.map((column) => (
+                <th
+                  key={column.id}
+                  data-column={column.id}
+                  className={column.numeric ? "fui-num" : undefined}
+                  aria-sort={
+                    column.sort?.active ? (column.sort.direction === "asc" ? "ascending" : "descending") : undefined
+                  }
+                >
+                  {column.sort ? (
+                    <button type="button" className="fui-data-table__sort" onClick={column.sort.onSort}>
+                      <ColumnLabel label={column.label} shortLabel={column.shortLabel} />
+                      <span aria-hidden="true">
+                        {column.sort.active ? (column.sort.direction === "asc" ? "↑" : "↓") : "↕"}
+                      </span>
+                    </button>
+                  ) : (
+                    <ColumnLabel label={column.label} shortLabel={column.shortLabel} />
+                  )}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row, index) => (
+              <tr
+                key={getRowKey(row)}
+                className={onRowClick ? "fui-data-table__row--clickable" : undefined}
+                tabIndex={onRowClick ? 0 : undefined}
+                onClick={onRowClick ? () => onRowClick(row) : undefined}
+                onKeyDown={onRowClick ? (event) => activateRow(event, row) : undefined}
+              >
+                {columns.map((column) => (
+                  <td
+                    key={column.id}
+                    data-column={column.id}
+                    className={[column.numeric ? "fui-num" : "", column.className ?? ""].filter(Boolean).join(" ") || undefined}
+                  >
+                    {column.render(row, index)}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {!loading && !rows.length && <div className="fui-data-table__empty">{emptyMessage}</div>}
+      </div>
+    </section>
+  );
+}
+
+function ColumnLabel({ label, shortLabel }: { label: string; shortLabel?: string }) {
+  return (
+    <>
+      <span className={`fui-data-table__label-long${shortLabel ? " has-short" : ""}`}>{label}</span>
+      {shortLabel && <span className="fui-data-table__label-short">{shortLabel}</span>}
+    </>
+  );
+}

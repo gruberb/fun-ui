@@ -6,22 +6,18 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
 }
 
-const sizeClasses = {
-  sm: "px-3 py-1.5 text-xs",
-  md: "px-5 py-2.5 text-sm",
-  lg: "px-7 py-3 text-base",
-};
-
 const Button = ({
   variant = "primary",
   size = "md",
+  type = "button",
   children,
   className = "",
   ...props
 }: ButtonProps) => {
   return (
     <button
-      className={`brutal-btn brutal-btn-${variant} ${sizeClasses[size]} ${className}`}
+      type={type}
+      className={`fui-btn fui-btn--${variant} fui-btn--${size} ${className}`.trim()}
       {...props}
     >
       {children}

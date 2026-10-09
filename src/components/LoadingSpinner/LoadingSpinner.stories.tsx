@@ -7,6 +7,7 @@ const meta = {
   argTypes: {
     size: { control: "select", options: ["small", "medium", "large"] },
     message: { control: "text" },
+    variant: { control: "select", options: ["spinner", "skeleton"] },
   },
 } satisfies Meta<typeof LoadingSpinner>;
 
@@ -17,6 +18,7 @@ export const Default: Story = {};
 
 export const Small: Story = { args: { size: "small", message: "Loading..." } };
 export const Large: Story = { args: { size: "large", message: "Crunching data..." } };
+export const Skeleton: Story = { args: { variant: "skeleton" } };
 export const NoMessage: Story = { args: { message: "" } };
 
 export const AllSizes: Story = {

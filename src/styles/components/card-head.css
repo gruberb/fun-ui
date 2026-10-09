@@ -1,0 +1,9 @@
+/* CardHead and SimpleCardHead: heading rows at the top of a bordered card. */
+
+.fui-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 18px 18px 14px; margin: 0; }
+.fui-card-head__title { margin: 2px 0 2px; font-size: 22px; font-weight: 500; line-height: 1.1; letter-spacing: -.03em; }
+.fui-card-head__subtitle { display: block; color: var(--fui-muted); font-size: 13.5px; }
+.fui-card-head__action button, .fui-card-head__action a { padding: 0; border: 0; background: none; color: var(--fui-accent); font-size: 14px; text-decoration: none; white-space: nowrap; }
+.fui-card-head__action button:hover, .fui-card-head__action a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+.fui-simple-card-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px 20px; padding: 18px 18px 0; }

@@ -1,0 +1,11 @@
+/* MatchTile: compact fixture tile with time, two teams and ink score boxes. */
+
+.fui-match-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: 8px; margin: 0; padding: 0; list-style: none; }
+.fui-match-tile { display: grid; gap: 6px; width: 100%; padding: 10px 12px 12px; border: 1px solid var(--fui-line); background: var(--fui-raised); color: var(--fui-ink); text-align: left; }
+.fui-match-tile:hover { border-color: var(--fui-ink); }
+.fui-match-tile[aria-current] { border-color: var(--fui-ink); box-shadow: inset 0 0 0 1px var(--fui-ink); cursor: default; }
+.fui-match-tile__time { color: var(--fui-muted); font-family: var(--fui-font-mono); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; }
+.fui-match-tile__team { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; align-items: center; gap: 8px; color: var(--fui-ink-2); font-size: 13.5px; }
+.fui-match-tile__team > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fui-match-tile__team b { min-width: 22px; padding: 1px 0; background: var(--fui-ink); color: var(--fui-on-ink); font-family: var(--fui-font-mono); font-size: 13px; font-weight: 500; text-align: center; }
+.fui-match-tile__team.is-winner { color: var(--fui-ink); font-weight: 600; }

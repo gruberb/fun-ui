@@ -1,0 +1,9 @@
+.fui-badge {
+  display: inline-flex; align-items: center; padding: 2px 8px; border: 1px solid currentColor; border-radius: 999px;
+  font-family: var(--fui-font-mono); font-size: 10.5px; font-weight: 500; letter-spacing: .07em; line-height: 1.5; text-transform: uppercase; white-space: nowrap;
+}
+.fui-badge--neutral { color: var(--fui-ink-2); background: var(--fui-panel); border-color: var(--fui-line-strong); }
+.fui-badge--accent { color: var(--fui-accent); background: var(--fui-accent-soft); }
+.fui-badge--win { color: var(--fui-win); background: var(--fui-win-soft); }
+.fui-badge--loss { color: var(--fui-loss); background: var(--fui-loss-soft); }
+.fui-badge--warn { color: var(--fui-warn); background: var(--fui-warn-soft); }

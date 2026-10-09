@@ -1,0 +1,15 @@
+/* PageHeader: title block with optional controls; "hero" is a full-bleed grid-paper band. */
+
+.fui-page-header { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 16px 28px; padding: 36px 0 0; margin: 0 0 32px; }
+.fui-page-header__intro { min-width: 0; }
+.fui-page-header__title { margin: 0; font-size: clamp(40px, 4.6vw, 68px); font-weight: 560; line-height: .95; letter-spacing: -.05em; }
+.fui-page-header__description { margin: 12px 0 0; color: var(--fui-muted); font-size: 15px; }
+.fui-page-header__note { display: block; color: var(--fui-muted); font-weight: 400; }
+
+.fui-page-header--hero { margin-inline: calc(-1 * var(--fui-gutter)); padding: 36px var(--fui-gutter) 30px; margin-bottom: 0; border-bottom: 1px solid var(--fui-line); }
+.fui-page-header--hero .fui-page-header__title { font-size: clamp(52px, 6.4vw, 104px); line-height: .88; letter-spacing: -.055em; }
+.fui-page-header--hero .fui-kicker { color: var(--fui-ink-2); }
+
+@media (max-width: 1080px) {
+  .fui-page-header { grid-template-columns: 1fr; }
+}

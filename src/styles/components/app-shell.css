@@ -1,0 +1,30 @@
+/* AppShell: sticky sidebar on desktop; brand bar plus bottom nav at 860px and below. */
+
+.fui-app-shell { display: grid; grid-template-columns: var(--fui-shell-side, 236px) minmax(0, 1fr); min-height: 100vh; }
+.fui-app-shell__side { position: sticky; top: 0; z-index: 30; height: 100vh; overflow-y: auto; display: flex; flex-direction: column; gap: 22px; padding: 18px 14px; border-right: 1px solid var(--fui-line); background: var(--fui-paper); }
+.fui-app-shell__brand a { display: inline-flex; align-items: center; gap: 10px; width: fit-content; padding: 4px 8px; color: var(--fui-ink); text-decoration: none; }
+.fui-app-shell__brand img, .fui-app-shell__brand svg { width: 24px; height: 24px; flex: none; }
+.fui-app-shell__brand a > span { font-stretch: 112%; font-size: 13px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; }
+
+.fui-app-shell__nav { display: flex; flex-direction: column; gap: 2px; }
+.fui-app-shell__nav a { display: flex; align-items: center; gap: 10px; padding: 8px 10px; color: var(--fui-ink-2); font-size: 15px; text-decoration: none; }
+.fui-app-shell__nav a:hover { color: var(--fui-ink); background: var(--fui-panel); }
+.fui-app-shell__nav a.is-active { color: var(--fui-ink); background: var(--fui-raised); box-shadow: inset 0 0 0 1px var(--fui-line); }
+.fui-app-shell__nav-icon { display: inline-grid; place-items: center; width: 18px; height: 18px; flex: none; }
+.fui-app-shell__nav-icon svg, .fui-app-shell__bottom-icon svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+
+.fui-app-shell__main { min-width: 0; padding: 0 var(--fui-gutter) 40px; display: flex; flex-direction: column; }
+.fui-app-shell__main > * { min-width: 0; }
+
+.fui-app-shell__bottom-nav { display: none; }
+
+@media (max-width: 860px) {
+  .fui-app-shell { display: block; }
+  .fui-app-shell__side { height: auto; overflow: visible; flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 16px; padding-top: max(10px, env(safe-area-inset-top)); border-right: 0; border-bottom: 1px solid var(--fui-line); background: color-mix(in srgb, var(--fui-paper) 92%, transparent); backdrop-filter: blur(12px); }
+  .fui-app-shell__nav { display: none; }
+  .fui-app-shell__main { padding-bottom: calc(84px + env(safe-area-inset-bottom)); }
+  .fui-app-shell__bottom-nav { position: fixed; right: 0; bottom: 0; left: 0; z-index: 40; display: grid; padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); border-top: 1px solid var(--fui-line); background: var(--fui-paper); }
+  .fui-app-shell__bottom-nav a { display: grid; justify-items: center; gap: 2px; padding: 8px 0 10px; color: var(--fui-muted); font-family: var(--fui-font-mono); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; text-decoration: none; }
+  .fui-app-shell__bottom-nav a.is-active { color: var(--fui-ink); box-shadow: inset 0 2px 0 var(--fui-ink); }
+  .fui-app-shell__bottom-icon { display: grid; place-items: center; height: 20px; }
+}

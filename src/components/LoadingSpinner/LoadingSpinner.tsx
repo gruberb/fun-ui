@@ -1,29 +1,32 @@
 interface LoadingSpinnerProps {
   size?: "small" | "medium" | "large";
   message?: string;
+  /** "skeleton" renders shimmer blocks instead of a spinner. */
+  variant?: "spinner" | "skeleton";
+  /** Number of shimmer blocks when variant is "skeleton". */
+  count?: number;
 }
-
-const sizeClasses = {
-  small: "w-4 h-4 border-2",
-  medium: "w-8 h-8 border-4",
-  large: "w-12 h-12 border-4",
-};
 
 const LoadingSpinner = ({
   size = "medium",
   message = "Loading...",
+  variant = "spinner",
+  count = 3,
 }: LoadingSpinnerProps) => {
+  if (variant === "skeleton") {
+    return (
+      <div className="fui-skeleton" role="status" aria-label={message || "Loading"}>
+        {Array.from({ length: count }, (_, i) => (
+          <span key={i} className="fui-skeleton__block" />
+        ))}
+      </div>
+    );
+  }
+
   return (
-    <div className="flex flex-col items-center justify-center py-8">
-      <div
-        className={`${sizeClasses[size]} border-[var(--color-brutal-black)] border-t-[var(--color-brutal-yellow)] rounded-full`}
-        style={{ animation: "spin 1s linear infinite" }}
-      />
-      {message && (
-        <p className="mt-4 text-[var(--color-brutal-black)] font-bold uppercase tracking-wider text-sm">
-          {message}
-        </p>
-      )}
+    <div className="fui-loading" role="status">
+      <span className={`fui-spinner fui-spinner--${size}`} aria-hidden="true" />
+      {message && <p className="fui-loading__message fui-label">{message}</p>}
     </div>
   );
 };

@@ -17,7 +17,7 @@ export const Default: Story = {
     children: (
       <div>
         <h2 style={{ marginTop: 0 }}>Card Title</h2>
-        <p>This is a basic brutalist card with a heavy border and drop shadow.</p>
+        <p>This is a raised surface with a 1px hairline border.</p>
       </div>
     ),
   },
@@ -29,7 +29,7 @@ export const WithHover: Story = {
     children: (
       <div>
         <h2 style={{ marginTop: 0 }}>Hover Me</h2>
-        <p>This card translates and loses its shadow on hover.</p>
+        <p>The border darkens to ink on hover.</p>
       </div>
     ),
   },

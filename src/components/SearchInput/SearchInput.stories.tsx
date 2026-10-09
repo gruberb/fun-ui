@@ -51,7 +51,7 @@ export const Interactive: Story = {
             style={{
               marginTop: "0.5rem",
               fontSize: "0.875rem",
-              color: "var(--color-brutal-gray)",
+              color: "var(--fui-muted)",
             }}
           >
             Searching for: {value}

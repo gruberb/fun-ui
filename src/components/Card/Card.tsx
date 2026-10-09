@@ -7,10 +7,7 @@ interface CardProps extends HTMLAttributes<HTMLDivElement> {
 
 const Card = ({ hover = false, children, className = "", ...props }: CardProps) => {
   return (
-    <div
-      className={`brutal-card p-6 ${hover ? "brutal-card-hover" : ""} ${className}`}
-      {...props}
-    >
+    <div className={`fui-card ${hover ? "fui-card--hover" : ""} ${className}`.trim()} {...props}>
       {children}
     </div>
   );

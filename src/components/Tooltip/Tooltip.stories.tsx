@@ -13,7 +13,7 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     text: "This is a tooltip",
-    children: <span className="font-bold uppercase tracking-wider text-sm cursor-help underline">Hover me</span>,
+    children: <span className="fui-label" style={{ fontSize: 12, cursor: "help", textDecoration: "underline dotted", textUnderlineOffset: 3 }}>Hover me</span>,
   },
   decorators: [(Story) => <div style={{ paddingTop: "4rem" }}><Story /></div>],
 };
@@ -22,7 +22,7 @@ export const OnBadge: Story = {
   render: () => (
     <div style={{ paddingTop: "4rem" }}>
       <Tooltip text="3 points scored today">
-        <Badge variant="success">+3 PTS</Badge>
+        <Badge variant="win">+3 PTS</Badge>
       </Tooltip>
     </div>
   ),

@@ -17,8 +17,8 @@ export const CustomLabel: Story = {
 
 export const InContext: Story = {
   render: () => (
-    <div className="brutal-card p-4 flex items-center justify-between" style={{ maxWidth: 300 }}>
-      <span className="font-bold uppercase tracking-wider text-sm">Game Status</span>
+    <div className="fui-card" style={{ maxWidth: 300, display: "flex", alignItems: "center", justifyContent: "space-between", padding: 16 }}>
+      <span className="fui-label">Game Status</span>
       <LiveIndicator />
     </div>
   ),

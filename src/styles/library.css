@@ -1,79 +1,11 @@
-/* fun-ui library styles for consumers.
-   Import AFTER @import "tailwindcss" in your main CSS file.
-   Example:
-     @import "tailwindcss";
-     @import "fun-ui/styles";
-*/
+/* fun-ui consumer stylesheet.
+   Import once, after your font imports:
+     @import "@gruberb/fun-ui/styles";
+   Fonts are not bundled: load "Archivo Variable" and "IBM Plex Mono"
+   (e.g. @fontsource-variable/archivo, @fontsource/ibm-plex-mono). */
 
-@import "./brutal.css";
+@import "./tokens.css";
+@import "./base.css";
 @import "./animations.css";
-
-:root {
-  --brutal-black: #1A1A1A;
-  --brutal-white: #FAFAFA;
-  --brutal-cream: #F5F0E8;
-  --brutal-blue: #2563EB;
-  --brutal-red: #EF4444;
-  --brutal-yellow: #FACC15;
-  --brutal-green: #16A34A;
-  --brutal-pink: #EC4899;
-  --brutal-teal: #14B8A6;
-  --brutal-orange: #F97316;
-  --brutal-purple: #8B5CF6;
-  --brutal-gray: #6B7280;
-}
-
-@theme {
-  --color-brutal-black: #1A1A1A;
-  --color-brutal-white: #FAFAFA;
-  --color-brutal-cream: #F5F0E8;
-  --color-brutal-blue: #2563EB;
-  --color-brutal-red: #EF4444;
-  --color-brutal-yellow: #FACC15;
-  --color-brutal-green: #16A34A;
-  --color-brutal-pink: #EC4899;
-  --color-brutal-teal: #14B8A6;
-  --color-brutal-orange: #F97316;
-  --color-brutal-purple: #8B5CF6;
-  --color-brutal-gray: #6B7280;
-
-  --font-display: "Space Grotesk", sans-serif;
-  --font-body: "Inter", sans-serif;
-  --font-sans: "Space Grotesk", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-
-  --shadow-brutal: 4px 4px 0px 0px #1A1A1A;
-  --shadow-brutal-sm: 2px 2px 0px 0px #1A1A1A;
-
-  --breakpoint-sm: 640px;
-}
-
-html {
-  scrollbar-gutter: stable;
-}
-
-body {
-  font-family: var(--font-sans);
-  background-color: var(--color-brutal-white);
-  color: var(--color-brutal-black);
-}
-
-h1, h2, h3, h4, h5, h6 {
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-h1 { font-size: 2rem; line-height: 2.5rem; }
-h2 { font-size: 1.5rem; line-height: 2rem; }
-
-input, select, textarea, button {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  border-radius: 0;
-}
-
-*:focus-visible {
-  outline: 2px solid var(--color-brutal-black);
-  outline-offset: 2px;
-}
+@import "./components/core.css";
+@import "./components/extended.css";

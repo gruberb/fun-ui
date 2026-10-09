@@ -1,0 +1,8 @@
+/* Tag: bordered mono label with a coloured square from the series palette. */
+
+.fui-tag { display: inline-flex; align-items: center; gap: 6px; padding: 2px 8px; border: 1px solid var(--fui-line); color: var(--fui-ink-2); font-family: var(--fui-font-mono); font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
+.fui-tag::before { content: ""; width: 6px; height: 6px; background: var(--fui-tag-color, var(--fui-line-strong)); }
+.fui-tag--series-1 { --fui-tag-color: var(--fui-series-1); }
+.fui-tag--series-2 { --fui-tag-color: var(--fui-series-2); }
+.fui-tag--series-3 { --fui-tag-color: var(--fui-series-3); }
+.fui-tag--series-4 { --fui-tag-color: var(--fui-series-4); }

@@ -8,9 +8,11 @@ interface ModalProps {
   title: string;
   children: ReactNode;
   footer?: ReactNode;
+  /** Accessible name of the close button. */
+  closeLabel?: string;
 }
 
-const Modal = ({ isOpen, onClose, title, children, footer }: ModalProps) => {
+const Modal = ({ isOpen, onClose, title, children, footer, closeLabel = "Close modal" }: ModalProps) => {
   useEffect(() => {
     if (!isOpen) return;
 
@@ -29,45 +31,27 @@ const Modal = ({ isOpen, onClose, title, children, footer }: ModalProps) => {
   if (!isOpen) return null;
 
   return createPortal(
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      onClick={onClose}
-    >
-      <div className="fixed inset-0 bg-[var(--color-brutal-black)]/50" />
-
+    <div className="fui-modal" onClick={onClose}>
       <div
-        className="relative w-full max-w-lg border-2 border-[var(--color-brutal-black)] bg-white shadow-brutal"
+        className="fui-modal__dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b-2 border-[var(--color-brutal-black)] px-6 py-4">
-          <h2 className="text-lg">{title}</h2>
-          <button
-            onClick={onClose}
-            className="brutal-btn brutal-btn-ghost p-1 border-none"
-            aria-label="Close modal"
-          >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="square"
-            >
+        <div className="fui-modal__head">
+          <h2 className="fui-modal__title">{title}</h2>
+          <button type="button" onClick={onClose} className="fui-modal__close" aria-label={closeLabel}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" aria-hidden="true">
               <line x1="18" y1="6" x2="6" y2="18" />
               <line x1="6" y1="6" x2="18" y2="18" />
             </svg>
           </button>
         </div>
 
-        <div className="px-6 py-4">{children}</div>
+        <div className="fui-modal__body">{children}</div>
 
-        {footer && (
-          <div className="flex justify-end gap-3 border-t-2 border-[var(--color-brutal-black)] px-6 py-4">
-            {footer}
-          </div>
-        )}
+        {footer && <div className="fui-modal__foot">{footer}</div>}
       </div>
     </div>,
     document.body,

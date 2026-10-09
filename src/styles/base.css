@@ -1,0 +1,38 @@
+/* Document defaults. Opt in by importing "@gruberb/fun-ui/styles"; components
+   work without these, but apps get the paper background and focus ring. */
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; background: var(--fui-paper); color-scheme: light; }
+body {
+  margin: 0; min-width: 320px; min-height: 100vh;
+  background: var(--fui-paper); color: var(--fui-ink);
+  font-family: var(--fui-font-sans); font-size: 15px; line-height: 1.5;
+  font-synthesis: none; -webkit-font-smoothing: antialiased;
+}
+button, input, select { font: inherit; color: inherit; }
+a { color: inherit; }
+h1, h2, h3, h4 { text-wrap: balance; }
+a[href], button:not(:disabled), select:not(:disabled), summary,
+[role="button"]:not([aria-disabled="true"]), [role="link"]:not([aria-disabled="true"]) { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--fui-accent); outline-offset: 2px; }
+::selection { background: var(--fui-accent-soft); }
+* { scrollbar-color: var(--fui-line-strong) transparent; }
+select option, select optgroup { color: var(--fui-ink); background-color: var(--fui-raised); }
+
+.fui-visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.fui-num { font-variant-numeric: tabular-nums; text-align: right; }
+
+/* Mono uppercase annotation, shared by labels, kickers and table heads. */
+.fui-label { font-family: var(--fui-font-mono); letter-spacing: .08em; text-transform: uppercase; }
+.fui-kicker { margin: 0 0 6px; color: var(--fui-muted); font-family: var(--fui-font-mono); font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; }
+
+/* Grid-paper surface used by hero bands and profile headers. */
+.fui-grid-paper {
+  background-color: var(--fui-panel);
+  background-image: linear-gradient(var(--fui-grid) 1px, transparent 1px), linear-gradient(90deg, var(--fui-grid) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+}

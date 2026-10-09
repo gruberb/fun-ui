@@ -1,0 +1,4 @@
+.fui-stars { display: inline-flex; gap: 2px; }
+.fui-stars__star { padding: 0 2px; border: 0; background: none; color: var(--fui-line-strong); font-size: 28px; line-height: 1; transition: color .12s; }
+.fui-stars__star.is-on { color: var(--fui-chrome); }
+.fui-stars__star:hover { color: var(--fui-warn); }

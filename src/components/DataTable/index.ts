@@ -1,2 +1,2 @@
 export { default as DataTable } from "./DataTable";
-export type { Column, DataRow, DataTableProps } from "./types";
+export type { DataTableColumn, DataTableFilter, DataTableSearch, DataTableProps } from "./DataTable";

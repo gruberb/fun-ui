@@ -1,0 +1,7 @@
+.fui-progress { --fui-progress-color: var(--fui-accent); }
+.fui-progress--success { --fui-progress-color: var(--fui-win); }
+.fui-progress--warning { --fui-progress-color: var(--fui-warn); }
+.fui-progress__head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; color: var(--fui-muted); font-size: 11px; }
+.fui-progress__pct { color: var(--fui-ink); font-variant-numeric: tabular-nums; }
+.fui-progress__track { height: 8px; border: 1px solid var(--fui-line-strong); background: var(--fui-panel); }
+.fui-progress__bar { height: 100%; background: var(--fui-progress-color); transition: width .3s ease-out; }

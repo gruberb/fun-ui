@@ -1,0 +1,4 @@
+.fui-error-boundary { min-height: 400px; display: flex; align-items: center; justify-content: center; padding: 32px; }
+.fui-error-boundary__card { width: 100%; max-width: 440px; padding: 32px; text-align: center; }
+.fui-error-boundary__title { margin: 0 0 6px; font-size: 20px; font-weight: 500; letter-spacing: -.01em; }
+.fui-error-boundary__text { margin: 0 0 20px; color: var(--fui-muted); font-size: 14px; }

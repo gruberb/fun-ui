@@ -66,7 +66,7 @@ export const Interactive: Story = {
           <input
             type="text"
             placeholder="Collection name"
-            className="mt-3 w-full border-2 border-[var(--color-brutal-black)] px-3 py-2 text-sm"
+            style={{ marginTop: 12, width: "100%", minHeight: 38, padding: "0 12px", border: "1px solid var(--fui-line-strong)", background: "var(--fui-raised)", borderRadius: 0 }}
           />
         </Modal>
       </>

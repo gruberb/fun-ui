@@ -6,12 +6,6 @@ interface ProgressBarProps {
   className?: string;
 }
 
-const variantColors = {
-  default: "var(--color-brutal-blue)",
-  success: "var(--color-brutal-green)",
-  warning: "var(--color-brutal-yellow)",
-};
-
 const ProgressBar = ({
   value,
   label,
@@ -22,29 +16,22 @@ const ProgressBar = ({
   const clamped = Math.max(0, Math.min(100, value));
 
   return (
-    <div className={className}>
+    <div className={`fui-progress fui-progress--${variant} ${className}`.trim()}>
       {(label || showPercentage) && (
-        <div className="flex justify-between items-center mb-1">
-          {label && (
-            <span className="text-xs font-bold uppercase tracking-wider">
-              {label}
-            </span>
-          )}
-          {showPercentage && (
-            <span className="text-xs font-bold tabular-nums">
-              {Math.round(clamped)}%
-            </span>
-          )}
+        <div className="fui-progress__head fui-label">
+          {label && <span>{label}</span>}
+          {showPercentage && <span className="fui-progress__pct">{Math.round(clamped)}%</span>}
         </div>
       )}
-      <div className="h-4 border-2 border-[var(--color-brutal-black)] bg-white">
-        <div
-          className="h-full transition-all duration-300 ease-out"
-          style={{
-            width: `${clamped}%`,
-            backgroundColor: variantColors[variant],
-          }}
-        />
+      <div
+        className="fui-progress__track"
+        role="progressbar"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={Math.round(clamped)}
+        aria-label={label}
+      >
+        <div className="fui-progress__bar" style={{ width: `${clamped}%` }} />
       </div>
     </div>
   );

@@ -10,11 +10,14 @@ import TabNavigation from "../TabNavigation/TabNavigation";
 import StatusBox from "../StatusBox/StatusBox";
 import EmptyState from "../EmptyState/EmptyState";
 import StarRating from "../StarRating/StarRating";
-import DataTable from "../DataTable/DataTable";
+import DataTable, { type DataTableColumn } from "../DataTable/DataTable";
 import StatCard from "../StatCard/StatCard";
 import LiveIndicator from "../LiveIndicator/LiveIndicator";
 import Tooltip from "../Tooltip/Tooltip";
-import type { Column } from "../DataTable/types";
+import SearchInput from "../SearchInput/SearchInput";
+import ProgressBar from "../ProgressBar/ProgressBar";
+import Modal from "../Modal/Modal";
+import Footer from "../Footer/Footer";
 
 const Placeholder = () => null;
 
@@ -26,14 +29,16 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const columns: Column[] = [
-  { key: "rank", header: "#" },
-  { key: "name", header: "Name" },
-  { key: "score", header: "Score", sortable: true },
-  { key: "status", header: "Status" },
+type Row = { id: number; rank: number; name: string; score: number; status: string };
+
+const columns: DataTableColumn<Row>[] = [
+  { id: "rank", label: "#", render: (row) => row.rank },
+  { id: "name", label: "Name", render: (row) => row.name },
+  { id: "score", label: "Score", numeric: true, render: (row) => row.score },
+  { id: "status", label: "Status", render: (row) => row.status },
 ];
 
-const data = [
+const data: Row[] = [
   { id: 1, rank: 1, name: "Alpha", score: 95, status: "Active" },
   { id: 2, rank: 2, name: "Beta", score: 88, status: "Active" },
   { id: 3, rank: 3, name: "Gamma", score: 76, status: "Inactive" },
@@ -48,9 +53,11 @@ export const FullPage: Story = {
 
     return (
       <div style={{ maxWidth: 900, margin: "0 auto" }}>
-        <PageHeader title="Dashboard" subtitle="Project overview" badge="Beta">
-          <Button size="sm" variant="secondary">Settings</Button>
-        </PageHeader>
+        <PageHeader
+          title="Dashboard"
+          eyebrow="Project overview"
+          controls={<Button size="sm" variant="secondary">Settings</Button>}
+        />
 
         <TabNavigation
           tabs={[
@@ -81,11 +88,11 @@ export const FullPage: Story = {
                 <LiveIndicator />
               </div>
               <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-                <Badge variant="success">Deployed</Badge>
-                <Badge variant="warning">Review</Badge>
-                <Badge variant="primary">New</Badge>
+                <Badge variant="win">Deployed</Badge>
+                <Badge variant="warn">Review</Badge>
+                <Badge variant="accent">New</Badge>
                 <Tooltip text="3 issues need attention">
-                  <Badge variant="danger">3 Issues</Badge>
+                  <Badge variant="loss">3 Issues</Badge>
                 </Tooltip>
               </div>
             </Card>
@@ -94,12 +101,12 @@ export const FullPage: Story = {
 
         {tab === "rankings" && (
           <DataTable
-            title="Leaderboard"
-            subtitle="Top performers this week"
-            dateBadge="Apr 7, 2026"
+            ariaLabel="Leaderboard"
             columns={columns}
-            data={data}
-            initialSortKey="score"
+            rows={data}
+            getRowKey={(row) => String(row.id)}
+            countLabel="Top performers this week"
+            minWidth="480px"
           />
         )}
 
@@ -107,7 +114,7 @@ export const FullPage: Story = {
           <Card>
             <h3 style={{ marginTop: 0 }}>Rate your experience</h3>
             <StarRating value={rating} onChange={setRating} />
-            <p style={{ fontSize: "0.875rem", marginTop: "0.75rem", color: "var(--color-brutal-gray)" }}>
+            <p style={{ fontSize: "0.875rem", marginTop: "0.75rem", color: "var(--fui-muted)" }}>
               {rating}/5 stars selected
             </p>
           </Card>
@@ -120,12 +127,15 @@ export const FullPage: Story = {
 export const LoadingState: Story = {
   render: () => (
     <div style={{ maxWidth: 900, margin: "0 auto" }}>
-      <PageHeader title="Rankings" subtitle="Loading data..." />
+      <PageHeader title="Rankings" description="Loading data..." />
       <DataTable
-        title="Season Rankings"
+        ariaLabel="Season rankings"
         columns={columns}
-        data={[]}
-        isLoading
+        rows={[]}
+        getRowKey={(row) => String(row.id)}
+        emptyMessage="No data to show."
+        loading
+        minWidth="480px"
       />
     </div>
   ),
@@ -177,11 +187,10 @@ export const AllButtons: Story = {
 
       <h2 style={{ marginBottom: "1rem" }}>Badges</h2>
       <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginBottom: "1.5rem" }}>
-        <Badge variant="primary">Primary</Badge>
-        <Badge variant="success">Success</Badge>
-        <Badge variant="warning">Warning</Badge>
-        <Badge variant="danger">Danger</Badge>
-        <Badge variant="info">Info</Badge>
+        <Badge variant="win">Win</Badge>
+        <Badge variant="loss">Loss</Badge>
+        <Badge variant="warn">Warn</Badge>
+        <Badge variant="accent">Accent</Badge>
         <Badge variant="neutral">Neutral</Badge>
       </div>
 
@@ -193,4 +202,85 @@ export const AllButtons: Story = {
       </div>
     </div>
   ),
+};
+
+const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
+  <section style={{ marginBottom: 32 }}>
+    <p className="fui-kicker">{title}</p>
+    {children}
+  </section>
+);
+
+export const AllComponents: Story = {
+  render: () => {
+    const [query, setQuery] = useState("");
+    const [tab, setTab] = useState("one");
+    const [rating, setRating] = useState(3);
+    const [open, setOpen] = useState(false);
+
+    return (
+      <div style={{ maxWidth: 900, margin: "0 auto" }}>
+        <Section title="Search">
+          <SearchInput value={query} onChange={setQuery} onClear={() => setQuery("")} placeholder="Search..." />
+        </Section>
+
+        <Section title="Tabs">
+          <TabNavigation
+            tabs={[{ id: "one", label: "One" }, { id: "two", label: "Two" }, { id: "three", label: "Three" }]}
+            activeTab={tab}
+            onTabChange={setTab}
+          />
+        </Section>
+
+        <Section title="Stats">
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+            <StatCard label="Points" value="1,284" trend="up" />
+            <StatCard label="Rank" value="12" trend="neutral" />
+            <StatCard label="Misses" value="3" trend="down" />
+          </div>
+        </Section>
+
+        <Section title="Status">
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
+            <StatusBox title="Positive" status="positive" label="" />
+            <StatusBox title="Negative" status="negative" label="" />
+            <StatusBox title="Warning" status="warning" label="" />
+            <StatusBox title="Info" status="info" label="" />
+          </div>
+        </Section>
+
+        <Section title="Progress">
+          <div style={{ display: "grid", gap: 12 }}>
+            <ProgressBar value={40} label="Default" showPercentage />
+            <ProgressBar value={80} label="Success" variant="success" showPercentage />
+            <ProgressBar value={25} label="Warning" variant="warning" showPercentage />
+          </div>
+        </Section>
+
+        <Section title="Feedback">
+          <div style={{ display: "flex", gap: 24, alignItems: "center", flexWrap: "wrap" }}>
+            <LoadingSpinner size="small" message="" />
+            <LiveIndicator />
+            <StarRating value={rating} onChange={setRating} />
+            <Tooltip text="Hairline tooltip"><Badge variant="accent">Hover</Badge></Tooltip>
+            <Button variant="secondary" size="sm" onClick={() => setOpen(true)}>Open modal</Button>
+          </div>
+          <ErrorMessage message="Failed to load data." onRetry={() => {}} />
+          <LoadingSpinner variant="skeleton" count={3} />
+        </Section>
+
+        <Section title="Card">
+          <Card hover>
+            <EmptyState heading="Nothing here" description="Empty state inside a card." />
+          </Card>
+        </Section>
+
+        <Modal isOpen={open} onClose={() => setOpen(false)} title="Modal" footer={<Button size="sm" onClick={() => setOpen(false)}>Done</Button>}>
+          <p style={{ margin: 0 }}>Modal body on a raised surface with an ink border.</p>
+        </Modal>
+
+        <Footer author="fun-ui" />
+      </div>
+    );
+  },
 };

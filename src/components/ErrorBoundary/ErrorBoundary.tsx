@@ -3,6 +3,9 @@ import { Component, type ErrorInfo, type ReactNode } from "react";
 interface Props {
   children: ReactNode;
   fallback?: ReactNode;
+  title?: string;
+  description?: string;
+  reloadLabel?: string;
 }
 
 interface State {
@@ -27,21 +30,17 @@ class ErrorBoundary extends Component<Props, State> {
         return this.props.fallback;
       }
 
+      const { title = "Something went wrong", description = "An unexpected error has occurred.", reloadLabel = "Reload page" } = this.props;
       return (
-        <div className="min-h-[400px] flex items-center justify-center p-8">
-          <div className="brutal-card p-8 max-w-md w-full text-center">
-            <h2 className="text-xl mb-2">Something went wrong</h2>
-            <p className="text-sm text-[var(--color-brutal-gray)] mb-4">
-              An unexpected error has occurred.
-            </p>
-            <div className="bg-[var(--color-brutal-red)]/10 border-2 border-[var(--color-brutal-red)] text-red-700 px-4 py-3 mb-4 text-sm text-left">
-              {this.state.error?.message || "Unknown error"}
+        <div className="fui-error-boundary">
+          <div className="fui-card fui-error-boundary__card">
+            <h2 className="fui-error-boundary__title">{title}</h2>
+            <p className="fui-error-boundary__text">{description}</p>
+            <div className="fui-error fui-error--code" role="alert">
+              <p className="fui-error__message">{this.state.error?.message || "Unknown error"}</p>
             </div>
-            <button
-              onClick={() => window.location.reload()}
-              className="brutal-btn brutal-btn-primary px-5 py-2.5 text-sm"
-            >
-              Reload Page
+            <button type="button" onClick={() => window.location.reload()} className="fui-btn fui-btn--primary">
+              {reloadLabel}
             </button>
           </div>
         </div>

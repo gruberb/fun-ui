@@ -24,7 +24,7 @@ export const Interactive: Story = {
     return (
       <div>
         <StarRating value={rating} onChange={setRating} />
-        <p className="mt-2 text-sm font-bold uppercase tracking-wider">
+        <p className="fui-label" style={{ marginTop: 8, fontSize: 11, color: "var(--fui-muted)" }}>
           {rating > 0 ? `${rating} / 5 stars` : "Click to rate"}
         </p>
       </div>

@@ -1,0 +1,16 @@
+/* Components extracted from Punktespiegel: one @import per component stylesheet. */
+@import "./data-table.css";
+@import "./page-header.css";
+@import "./stepper-select.css";
+@import "./segmented.css";
+@import "./card-head.css";
+@import "./logo-tile.css";
+@import "./portrait.css";
+@import "./tag.css";
+@import "./form-chip.css";
+@import "./trend-badge.css";
+@import "./sticker.css";
+@import "./match-tile.css";
+@import "./popover.css";
+@import "./app-shell.css";
+@import "./notice.css";

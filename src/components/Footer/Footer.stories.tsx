@@ -24,10 +24,10 @@ export const WithCustomContent: Story = {
   args: {
     children: (
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <span style={{ fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+        <span className="fui-label" style={{ fontSize: 11 }}>
           How Can I Play This Game?
         </span>
-        <span style={{ fontSize: "0.75rem", color: "var(--color-brutal-gray)" }}>
+        <span className="fui-label" style={{ fontSize: 11, color: "var(--fui-muted)" }}>
           2025
         </span>
       </div>

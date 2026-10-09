@@ -1,0 +1,15 @@
+/* FormChip: win / draw / loss squares. */
+
+.fui-form-chips { display: inline-flex; gap: 3px; }
+.fui-form-chips-empty { color: var(--fui-muted); }
+.fui-form-chip { width: 20px; height: 20px; display: inline-grid; place-items: center; color: #fff; font-family: var(--fui-font-mono); font-size: 10px; font-style: normal; font-weight: 600; }
+.fui-form-chip[tabindex] { cursor: help; }
+.fui-form-chip:focus-visible { outline-offset: 1px; }
+.fui-form-chip--win { background: var(--fui-win); }
+.fui-form-chip--draw { background: var(--fui-draw); }
+.fui-form-chip--loss { background: var(--fui-loss); }
+
+@media (max-width: 600px) {
+  .fui-form-chip { width: 16px; height: 16px; font-size: 8.5px; }
+  .fui-form-chips { gap: 2px; }
+}

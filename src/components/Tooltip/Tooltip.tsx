@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { useState } from "react";
+import { useId, useState } from "react";
 
 interface TooltipProps {
   text: string;
@@ -8,24 +8,20 @@ interface TooltipProps {
 
 const Tooltip = ({ text, children }: TooltipProps) => {
   const [visible, setVisible] = useState(false);
+  const id = useId();
 
   return (
     <span
-      className="relative inline-block"
+      className="fui-tooltip"
+      aria-describedby={visible ? id : undefined}
       onMouseEnter={() => setVisible(true)}
       onMouseLeave={() => setVisible(false)}
+      onFocus={() => setVisible(true)}
+      onBlur={() => setVisible(false)}
     >
       {children}
       {visible && (
-        <span
-          className="absolute z-10 w-48 text-center p-2 text-xs bg-[var(--color-brutal-black)] text-white border-2 border-[var(--color-brutal-black)] font-bold pointer-events-none"
-          style={{
-            bottom: "125%",
-            left: "50%",
-            marginLeft: "-96px",
-            boxShadow: "2px 2px 0px 0px var(--color-brutal-yellow)",
-          }}
-        >
+        <span id={id} role="tooltip" className="fui-tooltip__bubble">
           {text}
         </span>
       )}

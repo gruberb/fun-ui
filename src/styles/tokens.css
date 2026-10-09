@@ -1,0 +1,62 @@
+/* fun-ui design tokens: spec-sheet design.
+   Linen paper and aubergine ink with hairline rules. Every hue comes from the
+   "Welcome home" embroidery palette (Meditations in Color). Single light theme.
+   Components only read the role tokens; apps may override them on :root. */
+
+:root {
+  /* Palette: source swatches. */
+  --fui-red: #d86c3c;
+  --fui-cadmium: #c03020;
+  --fui-azure: #206080;
+  --fui-sap: #608030;
+  --fui-chrome: #d89c18;
+  --fui-sepia: #843c24;
+  --fui-greyish-orange: #c0a080;
+  --fui-warm-grey: #d0c0c0;
+  --fui-greyish-rose: #786060;
+  --fui-purple: #503050;
+  --fui-madder: #cc8460;
+  --fui-terracotta: #b45454;
+
+  /* Surfaces and text. */
+  --fui-paper: #f3ecdc;
+  --fui-panel: #f8f3e7;
+  --fui-raised: #fdfaf2;
+  --fui-ink: #2a1f33;
+  --fui-ink-2: #4e3f4c;
+  --fui-muted: var(--fui-greyish-rose);
+  --fui-on-ink: #fdfaf2;
+
+  /* Rules and overlays. */
+  --fui-line: #e2d8c4;
+  --fui-line-soft: #ece4d3;
+  --fui-line-strong: #c9b597;
+  --fui-hover: rgba(42, 31, 51, .04);
+  --fui-grid: rgba(42, 31, 51, .05);
+  --fui-shadow-pop: 0 14px 36px rgba(42, 31, 51, .14);
+
+  /* Accent and status. */
+  --fui-accent: var(--fui-azure);
+  --fui-accent-soft: #dbe6e6;
+  --fui-win: var(--fui-sap);
+  --fui-draw: var(--fui-greyish-rose);
+  --fui-loss: var(--fui-cadmium);
+  /* Chrome yellow darkened so warning text keeps 4.5:1 on paper. */
+  --fui-warn: #9a6a08;
+  --fui-win-soft: #e3e7cf;
+  --fui-loss-soft: #f4dccf;
+  --fui-warn-soft: #f5e6c4;
+
+  /* Categorical series (positions, pinned lines). */
+  --fui-series-1: var(--fui-chrome);
+  --fui-series-2: var(--fui-azure);
+  --fui-series-3: var(--fui-sap);
+  --fui-series-4: var(--fui-cadmium);
+  --fui-logo-bg: #fdfaf2;
+  --fui-sticker-edge: #fdfaf2;
+
+  /* Type and layout. */
+  --fui-font-sans: "Archivo Variable", "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --fui-font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --fui-gutter: clamp(16px, 3vw, 40px);
+}

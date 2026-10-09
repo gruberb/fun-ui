@@ -1,0 +1,19 @@
+.fui-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  border: 1px solid transparent; border-radius: 0; background: transparent; color: var(--fui-ink);
+  font-family: var(--fui-font-sans); font-weight: 500; line-height: 1.2; white-space: nowrap;
+  transition: background-color .12s, color .12s, border-color .12s;
+}
+.fui-btn:disabled { opacity: .4; cursor: not-allowed; }
+.fui-btn--sm { min-height: 30px; padding: 0 12px; font-size: 12px; }
+.fui-btn--md { min-height: 38px; padding: 0 18px; font-size: 13px; }
+.fui-btn--lg { min-height: 46px; padding: 0 26px; font-size: 15px; }
+
+.fui-btn--primary { background: var(--fui-ink); border-color: var(--fui-ink); color: var(--fui-on-ink); }
+.fui-btn--primary:hover:not(:disabled) { background: var(--fui-accent); border-color: var(--fui-accent); }
+.fui-btn--secondary { background: var(--fui-raised); border-color: var(--fui-line-strong); }
+.fui-btn--secondary:hover:not(:disabled) { border-color: var(--fui-ink); background: var(--fui-panel); }
+.fui-btn--danger { background: var(--fui-loss); border-color: var(--fui-loss); color: var(--fui-on-ink); }
+.fui-btn--danger:hover:not(:disabled) { background: var(--fui-ink); border-color: var(--fui-ink); }
+.fui-btn--ghost { color: var(--fui-ink-2); }
+.fui-btn--ghost:hover:not(:disabled) { color: var(--fui-ink); background: var(--fui-hover); }

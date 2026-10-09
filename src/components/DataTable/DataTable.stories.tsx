@@ -1,113 +1,94 @@
+import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import DataTable from "./DataTable";
-import type { Column } from "./types";
+import type { DataTableColumn, DataTableProps } from "./DataTable";
 
-const sampleColumns: Column[] = [
-  { key: "rank", header: "#" },
-  { key: "name", header: "Name" },
-  { key: "points", header: "Points", sortable: true },
-  { key: "goals", header: "Goals", sortable: true },
-  { key: "assists", header: "Assists", sortable: true, responsive: "md" },
-  { key: "gamesPlayed", header: "GP", responsive: "lg" },
+type Team = { id: string; name: string; played: number; won: number; points: number; region: string };
+
+const teams: Team[] = [
+  { id: "alpha", name: "Alpha FC", played: 12, won: 9, points: 29, region: "North" },
+  { id: "bravo", name: "Bravo United", played: 12, won: 8, points: 26, region: "South" },
+  { id: "charlie", name: "Charlie Athletic", played: 12, won: 7, points: 24, region: "North" },
+  { id: "delta", name: "Delta Town", played: 12, won: 6, points: 21, region: "East" },
+  { id: "echo", name: "Echo Rovers", played: 12, won: 5, points: 19, region: "West" },
+  { id: "foxtrot", name: "Foxtrot City", played: 12, won: 4, points: 15, region: "South" },
+  { id: "golf", name: "Golf Wanderers", played: 12, won: 3, points: 12, region: "East" },
+  { id: "hotel", name: "Hotel Sporting", played: 12, won: 1, points: 7, region: "West" },
 ];
 
-const sampleData = [
-  { id: 1, rank: 1, name: "Team Alpha", points: 142, goals: 68, assists: 74, gamesPlayed: 82 },
-  { id: 2, rank: 2, name: "Team Beta", points: 138, goals: 71, assists: 67, gamesPlayed: 82 },
-  { id: 3, rank: 3, name: "Team Gamma", points: 125, goals: 59, assists: 66, gamesPlayed: 82 },
-  { id: 4, rank: 4, name: "Team Delta", points: 119, goals: 54, assists: 65, gamesPlayed: 82 },
-  { id: 5, rank: 5, name: "Team Epsilon", points: 112, goals: 51, assists: 61, gamesPlayed: 82 },
-  { id: 6, rank: 6, name: "Team Zeta", points: 108, goals: 49, assists: 59, gamesPlayed: 82 },
-  { id: 7, rank: 7, name: "Team Eta", points: 101, goals: 46, assists: 55, gamesPlayed: 82 },
-  { id: 8, rank: 8, name: "Team Theta", points: 95, goals: 42, assists: 53, gamesPlayed: 82 },
+const columns: DataTableColumn<Team>[] = [
+  { id: "name", label: "Team", render: (row) => <strong>{row.name}</strong> },
+  { id: "region", label: "Region", render: (row) => row.region },
+  { id: "played", label: "Played", shortLabel: "P", numeric: true, render: (row) => row.played },
+  { id: "won", label: "Won", shortLabel: "W", numeric: true, render: (row) => row.won },
+  { id: "points", label: "Points", shortLabel: "Pts", numeric: true, className: "fui-data-table__primary", render: (row) => row.points },
 ];
 
 const meta = {
-  title: "Data/DataTable",
-  component: DataTable,
-} satisfies Meta<typeof DataTable>;
+  title: "Data Display/DataTable",
+  component: DataTable<Team>,
+  args: { rows: teams, columns, getRowKey: (row: Team) => row.id, minWidth: "560px", ariaLabel: "League table" },
+} satisfies Meta<typeof DataTable<Team>>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {
-  args: {
-    title: "Season Rankings",
-    subtitle: "2024-25 Season",
-    columns: sampleColumns,
-    data: sampleData,
-    initialSortKey: "points",
-  },
+export const Default: Story = {};
+
+export const Compact: Story = { args: { variant: "compact" } };
+
+export const Loading: Story = { args: { loading: true } };
+
+export const Empty: Story = { args: { rows: [], emptyMessage: "No teams match this selection." } };
+
+export const BoundedRows: Story = { args: { maxVisibleRows: 4, countLabel: "8 teams" } };
+
+export const ClickableRows: Story = {
+  args: { onRowClick: (row: Team) => alert(`Open ${row.name}`) },
 };
 
-export const WithDateBadge: Story = {
-  args: {
-    title: "Daily Rankings",
-    dateBadge: "Apr 7, 2026",
-    columns: sampleColumns,
-    data: sampleData,
-  },
+function SearchFiltersAndSortingDemo(args: DataTableProps<Team>) {
+  const [query, setQuery] = useState("");
+  const [region, setRegion] = useState("all");
+  const [descending, setDescending] = useState(true);
+  const rows = teams
+    .filter((team) => team.name.toLowerCase().includes(query.toLowerCase()))
+    .filter((team) => region === "all" || team.region === region)
+    .sort((a, b) => (descending ? b.points - a.points : a.points - b.points));
+  const sortable = columns.map((column) =>
+    column.id === "points"
+      ? { ...column, sort: { active: true, direction: descending ? ("desc" as const) : ("asc" as const), onSort: () => setDescending(!descending) } }
+      : column,
+  );
+  return (
+    <DataTable
+      {...args}
+      rows={rows}
+      columns={sortable}
+      search={{ value: query, placeholder: "Search teams", onChange: setQuery }}
+      filters={[{
+        id: "region",
+        label: "Region",
+        value: region,
+        onChange: setRegion,
+        options: [{ value: "all", label: "All regions" }, ...["North", "South", "East", "West"].map((value) => ({ value, label: value }))],
+      }]}
+      countLabel={`${rows.length} teams`}
+    />
+  );
+}
+
+export const SearchFiltersAndSorting: Story = {
+  render: (args) => <SearchFiltersAndSortingDemo {...args} />,
 };
 
-export const Loading: Story = {
-  args: {
-    title: "Rankings",
-    columns: sampleColumns,
-    data: [],
-    isLoading: true,
-  },
-};
-
-export const Empty: Story = {
-  args: {
-    title: "Rankings",
-    columns: sampleColumns,
-    data: [],
-    emptyMessage: "No rankings data for this date.",
-  },
-};
-
-export const WithLimit: Story = {
-  args: {
-    title: "Top 3",
-    columns: sampleColumns,
-    data: sampleData,
-    limit: 3,
-    viewAllHref: "#",
-    viewAllText: "View All Rankings",
-  },
-};
-
-export const NoRankColors: Story = {
-  args: {
-    title: "Players",
-    columns: sampleColumns,
-    data: sampleData,
-    showRankColors: false,
-  },
-};
-
-export const CustomRenderers: Story = {
-  args: {
-    title: "Custom Cells",
-    columns: [
-      { key: "rank", header: "#" },
-      {
-        key: "name",
-        header: "Team",
-        render: (value: string) => <strong>{value}</strong>,
-      },
-      {
-        key: "points",
-        header: "Points",
-        sortable: true,
-        render: (value: number) => (
-          <span className="brutal-badge bg-[var(--color-brutal-yellow)] text-[var(--color-brutal-black)]">
-            {value}
-          </span>
-        ),
-      },
-    ],
-    data: sampleData.slice(0, 5),
-  },
+export const AllVariants: Story = {
+  render: (args) => (
+    <div style={{ display: "grid", gap: 24 }}>
+      <DataTable {...args} />
+      <DataTable {...args} variant="compact" maxVisibleRows={3} countLabel="Compact, bounded" />
+      <DataTable {...args} rows={[]} />
+      <DataTable {...args} loading />
+    </div>
+  ),
 };

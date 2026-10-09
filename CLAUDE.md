@@ -1,6 +1,6 @@
 # fun-ui
 
-Brutalist React component library. Storybook is the primary development and review tool.
+Spec-sheet React component library (linen paper, aubergine ink, hairline rules). Storybook is the primary development and review tool.
 
 ## Commands
 
@@ -19,8 +19,8 @@ npm run build-storybook  # Static Storybook build
 - Functional components with arrow functions, default export from the component file
 - Props interfaces extend native HTML attributes (e.g., `ButtonHTMLAttributes<HTMLButtonElement>`)
 - Variants use string union types, not enums
-- Tailwind utility classes combined with custom BEM-like classes from `brutal.css` (e.g., `brutal-btn`, `brutal-btn-primary`, `brutal-card`)
-- Template literal classNames: `` `brutal-btn brutal-btn-${variant} ${sizeClasses[size]} ${className}` ``
+- Plain CSS classes prefixed `fui-` (BEM-ish, e.g. `fui-btn fui-btn--primary`), no Tailwind
+- Text, aria labels and visually hidden strings are props with English defaults, never hard-coded
 - Storybook story imports use `@storybook/react-vite`, not `@storybook/react`
 
 ## Component Structure
@@ -40,20 +40,17 @@ New components must be added to `src/index.ts` (barrel file) under the correct c
 
 ## Styling Rules
 
-- NEVER use `border-radius` -- all elements have sharp corners
-- Shadows use CSS variables: `var(--shadow-brutal)` (4px) or `var(--shadow-brutal-sm)` (2px)
-- Hover effect pattern: `transform: translate(2px, 2px)` + `box-shadow: none`
-- New shared component styles go in `src/styles/brutal.css` inside `@layer components`
-- Component-specific animations go in `src/styles/animations.css`
-- Colors, fonts, and shadows are defined as CSS variables in `globals.css` AND as Tailwind `@theme` tokens -- keep both in sync
-- Fonts: Space Grotesk for display/headings, Inter for body text
+- Read only `--fui-*` tokens from `src/styles/tokens.css`; never hard-code hex values in component CSS
+- Each component has `src/styles/components/<kebab-name>.css`, registered with an `@import` in `core.css` (original components) or `extended.css` (components extracted from Punktespiegel)
+- No `border-radius` except pills and circles; no shadows except popovers (`--fui-shadow-pop`)
+- Shared helpers live in `base.css` (`fui-kicker`, `fui-label`, `fui-grid-paper`, `fui-visually-hidden`, `fui-num`)
+- Fonts: Archivo (text), IBM Plex Mono (labels and data); consumers load them, the library does not bundle them
 
 ## Library Export
 
-- Entry point: `src/index.ts` -> builds to `dist/fun-ui.js` (ES module)
+- Entry point: `src/index.ts` (re-exports `src/extended.ts`) -> builds to `dist/fun-ui.js` (ES module)
 - React, ReactDOM, and react/jsx-runtime are external (not bundled)
-- Consumer stylesheet: `src/styles/library.css` (exported as `fun-ui/styles`)
-- When adding new CSS variables or `@theme` tokens, update both `globals.css` and `library.css`
+- Consumer stylesheet: `src/styles/library.css` (exported as `@gruberb/fun-ui/styles`)
 
 ## Testing
 
